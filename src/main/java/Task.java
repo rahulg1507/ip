@@ -1,5 +1,6 @@
 /**
- * Represents a task with a description and completion status.
+ * Represents a basic task with a description and completion status.
+ * Specialized task types extend this class and customize their display.
  */
 public class Task {
     /** The text describing this task. */
@@ -8,114 +9,22 @@ public class Task {
     /** Whether this task has been completed. */
     protected boolean isDone;
 
-    /** Whether this task is a todo task. */
-    protected boolean isTodo;
-
-    /** The deadline text for this task, or {@code null} when it has no deadline. */
-    protected String by;
-
-    /** The plain-text start date and time for an event, or {@code null} for other task types. */
-    protected String from;
-
-    /** The plain-text end date and time for an event, or {@code null} for other task types. */
-    protected String to;
-
     /**
      * Creates an incomplete task with the given description.
      *
      * @param description the text describing the task
      */
     public Task(String description) {
-        this(description, false);
-    }
-
-    /**
-     * Creates an incomplete task with the given description and type.
-     *
-     * @param description the text describing the task
-     * @param isTodo whether the task is a todo task
-     */
-    public Task(String description, boolean isTodo) {
-        this(description, isTodo, null);
-    }
-
-    /**
-     * Creates an incomplete deadline task with the given description and deadline text.
-     *
-     * @param description the text describing the task
-     * @param by the plain-text deadline
-     */
-    public Task(String description, String by) {
-        this(description, false, by);
-    }
-
-    /**
-     * Creates an incomplete task with the given description, type, and optional deadline.
-     *
-     * @param description the text describing the task
-     * @param isTodo whether the task is a todo task
-     * @param by the plain-text deadline, or {@code null} when there is no deadline
-     */
-    public Task(String description, boolean isTodo, String by) {
         this.description = description;
         this.isDone = false;
-        this.isTodo = isTodo;
-        this.by = by;
-        this.from = null;
-        this.to = null;
     }
 
-    /**
-     * Creates an incomplete event task with the given description, start, and end text.
-     *
-     * @param description the text describing the event
-     * @param from the plain-text start date and time
-     * @param to the plain-text end date and time
-     */
-    public Task(String description, String from, String to) {
-        this.description = description;
-        this.isDone = false;
-        this.isTodo = false;
-        this.by = null;
-        this.from = from;
-        this.to = to;
-    }
-
-    /**
-     * Returns the icon used to show this task's completion status.
-     *
-     * @return {@code "X"} when done, or a space when not done
-     */
-    public String getStatusIcon() {
-        return isDone ? "X" : " ";
-    }
-
-    /**
-     * Returns the icon used to show this task's type.
-     *
-     * @return {@code "[D]"} for a deadline, {@code "[E]"} for an event,
-     *         {@code "[T]"} for a todo, or an empty string otherwise
-     */
-    public String getTypeIcon() {
-        if (by != null) {
-            return "[D]";
-        }
-        if (from != null) {
-            return "[E]";
-        }
-        return isTodo ? "[T]" : "";
-    }
-
-    /**
-     * Marks this task as completed.
-     */
+    /** Marks this task as completed. */
     public void markAsDone() {
         isDone = true;
     }
 
-    /**
-     * Marks this task as incomplete.
-     */
+    /** Marks this task as incomplete. */
     public void markAsNotDone() {
         isDone = false;
     }
@@ -130,17 +39,39 @@ public class Task {
     }
 
     /**
-     * Returns the description with its deadline or event-time suffix when applicable.
+     * Returns the type prefix for this task.
      *
-     * @return the task description, including deadline text when applicable
+     * @return an empty string for a basic task
+     */
+    public String getTypeIcon() {
+        return "";
+    }
+
+    /**
+     * Returns the description portion of this task's display.
+     *
+     * @return the task description
      */
     public String getDisplayDescription() {
-        if (by != null) {
-            return description + " (by: " + by + ")";
-        }
-        if (from != null) {
-            return description + " (from: " + from + " to: " + to + ")";
-        }
         return description;
+    }
+
+    /**
+     * Returns the completion marker used in the task display.
+     *
+     * @return {@code "X"} when done, or a space when not done
+     */
+    public String getStatusIcon() {
+        return isDone ? "X" : " ";
+    }
+
+    /**
+     * Returns this task in its display format.
+     *
+     * @return the status marker followed by the description
+     */
+    @Override
+    public String toString() {
+        return "[" + getStatusIcon() + "] " + description;
     }
 }
