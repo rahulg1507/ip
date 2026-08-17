@@ -48,13 +48,17 @@ public class Nova {
                 tasks[taskIndex].markAsNotDone();
                 System.out.println(" OK, I've marked this task as not done yet:");
                 System.out.println("   " + tasks[taskIndex]);
-            } else if (command.startsWith("todo ")) {
-                String description = command.substring(5);
-                tasks[taskCount] = new Todo(description);
-                taskCount++;
-                System.out.println(" Got it. I've added this task:");
-                System.out.println("  " + tasks[taskCount - 1]);
-                System.out.println(" Now you have " + taskCount + " tasks in the list.");
+            } else if (command.trim().equals("todo") || command.startsWith("todo ")) {
+                String description = command.trim().equals("todo") ? "" : command.substring(5).trim();
+                if (description.isEmpty()) {
+                    System.out.println(" Please add a description after 'todo'.");
+                } else {
+                    tasks[taskCount] = new Todo(description);
+                    taskCount++;
+                    System.out.println(" Got it. I've added this task:");
+                    System.out.println("  " + tasks[taskCount - 1]);
+                    System.out.println(" Now you have " + taskCount + " tasks in the list.");
+                }
             } else if (command.startsWith("deadline ")) {
                 int byIndex = command.indexOf(" /by ");
                 String description = command.substring(9, byIndex);
@@ -76,9 +80,7 @@ public class Nova {
                 System.out.println("  " + tasks[taskCount - 1]);
                 System.out.println(" Now you have " + taskCount + " tasks in the list.");
             } else {
-                tasks[taskCount] = new Task(command);
-                taskCount++;
-                System.out.println(" added: " + command);
+                System.out.println(" I don't recognize that command.");
             }
 
             System.out.println(divider);

@@ -18,11 +18,11 @@ Expected output:
     Bye. Hope to see you again soon!
     ____________________________________________________________
 
-## Add and list tasks
-Aim: Verify that entered tasks are stored and displayed in order.
+## Handle invalid commands
+Aim: Verify that an empty todo and an unrecognized command produce errors without adding tasks.
 Inputs:
-    read book
-    return book
+    todo
+    blah
     list
     bye
 Expected output:
@@ -36,15 +36,49 @@ Expected output:
     What can I do for you?
     ____________________________________________________________
     ____________________________________________________________
-     added: read book
+     Please add a description after 'todo'.
     ____________________________________________________________
     ____________________________________________________________
-     added: return book
+     I don't recognize that command.
     ____________________________________________________________
     ____________________________________________________________
      Here are the tasks in your list:
-     1.[ ] read book
-     2.[ ] return book
+    ____________________________________________________________
+    ____________________________________________________________
+    Bye. Hope to see you again soon!
+    ____________________________________________________________
+
+## Add and list tasks
+Aim: Verify that entered tasks are stored and displayed in order.
+Inputs:
+    todo read book
+    todo return book
+    list
+    bye
+Expected output:
+    ____________________________________________________________
+     _   _    ___    _   _    _
+    | \ | |  / _ \  | | | |  / \
+    |  \| | | | | | | | | | / _ \
+    | |\  | | |_| |  \ V / / ___ \
+    |_| \_|  \___/    \_/ /_/   \_\
+    Hello! I'm Nova.
+    What can I do for you?
+    ____________________________________________________________
+    ____________________________________________________________
+     Got it. I've added this task:
+      [T][ ] read book
+     Now you have 1 tasks in the list.
+    ____________________________________________________________
+    ____________________________________________________________
+     Got it. I've added this task:
+      [T][ ] return book
+     Now you have 2 tasks in the list.
+    ____________________________________________________________
+    ____________________________________________________________
+     Here are the tasks in your list:
+     1.[T][ ] read book
+     2.[T][ ] return book
     ____________________________________________________________
     ____________________________________________________________
     Bye. Hope to see you again soon!
@@ -53,8 +87,8 @@ Expected output:
 ## Mark and unmark tasks
 Aim: Verify that task completion status can be set and reversed.
 Inputs:
-    read book
-    return book
+    todo read book
+    todo return book
     mark 1
     mark 2
     unmark 2
@@ -71,27 +105,31 @@ Expected output:
     What can I do for you?
     ____________________________________________________________
     ____________________________________________________________
-     added: read book
+     Got it. I've added this task:
+      [T][ ] read book
+     Now you have 1 tasks in the list.
     ____________________________________________________________
     ____________________________________________________________
-     added: return book
+     Got it. I've added this task:
+      [T][ ] return book
+     Now you have 2 tasks in the list.
     ____________________________________________________________
     ____________________________________________________________
      Nice! I've marked this task as done:
-       [X] read book
+       [T][X] read book
     ____________________________________________________________
     ____________________________________________________________
      Nice! I've marked this task as done:
-       [X] return book
+       [T][X] return book
     ____________________________________________________________
     ____________________________________________________________
      OK, I've marked this task as not done yet:
-       [ ] return book
+       [T][ ] return book
     ____________________________________________________________
     ____________________________________________________________
      Here are the tasks in your list:
-     1.[X] read book
-     2.[ ] return book
+     1.[T][X] read book
+     2.[T][ ] return book
     ____________________________________________________________
     ____________________________________________________________
     Bye. Hope to see you again soon!
