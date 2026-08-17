@@ -11,6 +11,9 @@ public class Task {
     /** Whether this task is a todo task. */
     protected boolean isTodo;
 
+    /** The deadline text for this task, or {@code null} when it has no deadline. */
+    protected String by;
+
     /**
      * Creates an incomplete task with the given description.
      *
@@ -27,9 +30,31 @@ public class Task {
      * @param isTodo whether the task is a todo task
      */
     public Task(String description, boolean isTodo) {
+        this(description, isTodo, null);
+    }
+
+    /**
+     * Creates an incomplete deadline task with the given description and deadline text.
+     *
+     * @param description the text describing the task
+     * @param by the plain-text deadline
+     */
+    public Task(String description, String by) {
+        this(description, false, by);
+    }
+
+    /**
+     * Creates an incomplete task with the given description, type, and optional deadline.
+     *
+     * @param description the text describing the task
+     * @param isTodo whether the task is a todo task
+     * @param by the plain-text deadline, or {@code null} when there is no deadline
+     */
+    public Task(String description, boolean isTodo, String by) {
         this.description = description;
         this.isDone = false;
         this.isTodo = isTodo;
+        this.by = by;
     }
 
     /**
@@ -44,9 +69,12 @@ public class Task {
     /**
      * Returns the icon used to show this task's type.
      *
-     * @return {@code "[T]"} for a todo task, or an empty string otherwise
+     * @return {@code "[D]"} for a deadline, {@code "[T]"} for a todo, or an empty string otherwise
      */
     public String getTypeIcon() {
+        if (by != null) {
+            return "[D]";
+        }
         return isTodo ? "[T]" : "";
     }
 
@@ -71,5 +99,14 @@ public class Task {
      */
     public String getDescription() {
         return description;
+    }
+
+    /**
+     * Returns the description with its deadline suffix when this task has a deadline.
+     *
+     * @return the task description, including deadline text when applicable
+     */
+    public String getDisplayDescription() {
+        return by == null ? description : description + " (by: " + by + ")";
     }
 }

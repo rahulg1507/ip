@@ -132,3 +132,39 @@ Expected output:
     ____________________________________________________________
     Bye. Hope to see you again soon!
     ____________________________________________________________
+
+## Add and list deadline tasks
+Aim: Verify that deadline tasks preserve their plain-text deadline and display the D prefix.
+Inputs:
+    deadline return book /by Sunday
+    deadline submit assignment /by 11:59 pm
+    list
+    bye
+Expected output:
+    ____________________________________________________________
+     _   _    ___    _   _    _
+    | \ | |  / _ \  | | | |  / \
+    |  \| | | | | | | | | | / _ \
+    | |\  | | |_| |  \ V / / ___ \
+    |_| \_|  \___/    \_/ /_/   \_\
+    Hello! I'm Nova.
+    What can I do for you?
+    ____________________________________________________________
+    ____________________________________________________________
+     Got it. I've added this task:
+      [D][ ] return book (by: Sunday)
+     Now you have 1 tasks in the list.
+    ____________________________________________________________
+    ____________________________________________________________
+     Got it. I've added this task:
+      [D][ ] submit assignment (by: 11:59 pm)
+     Now you have 2 tasks in the list.
+    ____________________________________________________________
+    ____________________________________________________________
+     Here are the tasks in your list:
+     1.[D][ ] return book (by: Sunday)
+     2.[D][ ] submit assignment (by: 11:59 pm)
+    ____________________________________________________________
+    ____________________________________________________________
+    Bye. Hope to see you again soon!
+    ____________________________________________________________
