@@ -168,3 +168,39 @@ Expected output:
     ____________________________________________________________
     Bye. Hope to see you again soon!
     ____________________________________________________________
+
+## Add and list event tasks
+Aim: Verify that event tasks preserve their plain-text start and end values and display the E prefix.
+Inputs:
+    event project meeting /from Mon 2pm /to 4pm
+    event workshop /from Friday 9am /to Friday 11am
+    list
+    bye
+Expected output:
+    ____________________________________________________________
+     _   _    ___    _   _    _
+    | \ | |  / _ \  | | | |  / \
+    |  \| | | | | | | | | | / _ \
+    | |\  | | |_| |  \ V / / ___ \
+    |_| \_|  \___/    \_/ /_/   \_\
+    Hello! I'm Nova.
+    What can I do for you?
+    ____________________________________________________________
+    ____________________________________________________________
+     Got it. I've added this task:
+      [E][ ] project meeting (from: Mon 2pm to: 4pm)
+     Now you have 1 tasks in the list.
+    ____________________________________________________________
+    ____________________________________________________________
+     Got it. I've added this task:
+      [E][ ] workshop (from: Friday 9am to: Friday 11am)
+     Now you have 2 tasks in the list.
+    ____________________________________________________________
+    ____________________________________________________________
+     Here are the tasks in your list:
+     1.[E][ ] project meeting (from: Mon 2pm to: 4pm)
+     2.[E][ ] workshop (from: Friday 9am to: Friday 11am)
+    ____________________________________________________________
+    ____________________________________________________________
+    Bye. Hope to see you again soon!
+    ____________________________________________________________

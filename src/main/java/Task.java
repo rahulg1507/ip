@@ -14,6 +14,12 @@ public class Task {
     /** The deadline text for this task, or {@code null} when it has no deadline. */
     protected String by;
 
+    /** The plain-text start date and time for an event, or {@code null} for other task types. */
+    protected String from;
+
+    /** The plain-text end date and time for an event, or {@code null} for other task types. */
+    protected String to;
+
     /**
      * Creates an incomplete task with the given description.
      *
@@ -55,6 +61,24 @@ public class Task {
         this.isDone = false;
         this.isTodo = isTodo;
         this.by = by;
+        this.from = null;
+        this.to = null;
+    }
+
+    /**
+     * Creates an incomplete event task with the given description, start, and end text.
+     *
+     * @param description the text describing the event
+     * @param from the plain-text start date and time
+     * @param to the plain-text end date and time
+     */
+    public Task(String description, String from, String to) {
+        this.description = description;
+        this.isDone = false;
+        this.isTodo = false;
+        this.by = null;
+        this.from = from;
+        this.to = to;
     }
 
     /**
@@ -69,11 +93,15 @@ public class Task {
     /**
      * Returns the icon used to show this task's type.
      *
-     * @return {@code "[D]"} for a deadline, {@code "[T]"} for a todo, or an empty string otherwise
+     * @return {@code "[D]"} for a deadline, {@code "[E]"} for an event,
+     *         {@code "[T]"} for a todo, or an empty string otherwise
      */
     public String getTypeIcon() {
         if (by != null) {
             return "[D]";
+        }
+        if (from != null) {
+            return "[E]";
         }
         return isTodo ? "[T]" : "";
     }
@@ -102,11 +130,17 @@ public class Task {
     }
 
     /**
-     * Returns the description with its deadline suffix when this task has a deadline.
+     * Returns the description with its deadline or event-time suffix when applicable.
      *
      * @return the task description, including deadline text when applicable
      */
     public String getDisplayDescription() {
-        return by == null ? description : description + " (by: " + by + ")";
+        if (by != null) {
+            return description + " (by: " + by + ")";
+        }
+        if (from != null) {
+            return description + " (from: " + from + " to: " + to + ")";
+        }
+        return description;
     }
 }
