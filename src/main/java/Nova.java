@@ -25,33 +25,34 @@ public class Nova {
             String command = scanner.nextLine();
             System.out.println(divider);
 
-            if (command.equals("bye")) {
+            try {
+                if (command.equals("bye")) {
                 System.out.println("Bye. Hope to see you again soon!");
                 System.out.println(divider);
                 break;
-            }
+                }
 
-            if (command.equals("list")) {
+                if (command.equals("list")) {
                 System.out.println(" Here are the tasks in your list:");
                 for (int i = 0; i < taskCount; i++) {
                     System.out.println(" " + (i + 1) + "." + tasks[i]);
                 }
-            } else if (command.startsWith("mark ")) {
+                } else if (command.startsWith("mark ")) {
                 int taskNumber = Integer.parseInt(command.substring(5));
                 int taskIndex = taskNumber - 1;
                 tasks[taskIndex].markAsDone();
                 System.out.println(" Nice! I've marked this task as done:");
                 System.out.println("   " + tasks[taskIndex]);
-            } else if (command.startsWith("unmark ")) {
+                } else if (command.startsWith("unmark ")) {
                 int taskNumber = Integer.parseInt(command.substring(7));
                 int taskIndex = taskNumber - 1;
                 tasks[taskIndex].markAsNotDone();
                 System.out.println(" OK, I've marked this task as not done yet:");
                 System.out.println("   " + tasks[taskIndex]);
-            } else if (command.trim().equals("todo") || command.startsWith("todo ")) {
+                } else if (command.trim().equals("todo") || command.startsWith("todo ")) {
                 String description = command.trim().equals("todo") ? "" : command.substring(5).trim();
                 if (description.isEmpty()) {
-                    System.out.println(" Please add a description after 'todo'.");
+                        throw new NovaException("Please add a description after 'todo'.");
                 } else {
                     tasks[taskCount] = new Todo(description);
                     taskCount++;
@@ -59,7 +60,7 @@ public class Nova {
                     System.out.println("  " + tasks[taskCount - 1]);
                     System.out.println(" Now you have " + taskCount + " tasks in the list.");
                 }
-            } else if (command.startsWith("deadline ")) {
+                } else if (command.startsWith("deadline ")) {
                 int byIndex = command.indexOf(" /by ");
                 String description = command.substring(9, byIndex);
                 String by = command.substring(byIndex + 5);
@@ -68,7 +69,7 @@ public class Nova {
                 System.out.println(" Got it. I've added this task:");
                 System.out.println("  " + tasks[taskCount - 1]);
                 System.out.println(" Now you have " + taskCount + " tasks in the list.");
-            } else if (command.startsWith("event ")) {
+                } else if (command.startsWith("event ")) {
                 int fromIndex = command.indexOf(" /from ");
                 int toIndex = command.indexOf(" /to ");
                 String description = command.substring(6, fromIndex);
@@ -79,8 +80,11 @@ public class Nova {
                 System.out.println(" Got it. I've added this task:");
                 System.out.println("  " + tasks[taskCount - 1]);
                 System.out.println(" Now you have " + taskCount + " tasks in the list.");
-            } else {
-                System.out.println(" I don't recognize that command.");
+                } else {
+                    throw new NovaException("I don't recognize that command.");
+                }
+            } catch (NovaException exception) {
+                System.out.println(" " + exception.getMessage());
             }
 
             System.out.println(divider);
