@@ -34,7 +34,8 @@ public class Nova {
             if (command.equals("list")) {
                 System.out.println(" Here are the tasks in your list:");
                 for (int i = 0; i < taskCount; i++) {
-                    System.out.println(" " + (i + 1) + ".[" + tasks[i].getStatusIcon()
+                    System.out.println(" " + (i + 1) + "." + tasks[i].getTypeIcon()
+                            + "[" + tasks[i].getStatusIcon()
                             + "] " + tasks[i].getDescription());
                 }
             } else if (command.startsWith("mark ")) {
@@ -42,13 +43,22 @@ public class Nova {
                 int taskIndex = taskNumber - 1;
                 tasks[taskIndex].markAsDone();
                 System.out.println(" Nice! I've marked this task as done:");
-                System.out.println("   [X] " + tasks[taskIndex].getDescription());
+                System.out.println("   " + tasks[taskIndex].getTypeIcon() + "[X] "
+                        + tasks[taskIndex].getDescription());
             } else if (command.startsWith("unmark ")) {
                 int taskNumber = Integer.parseInt(command.substring(7));
                 int taskIndex = taskNumber - 1;
                 tasks[taskIndex].markAsNotDone();
                 System.out.println(" OK, I've marked this task as not done yet:");
-                System.out.println("   [ ] " + tasks[taskIndex].getDescription());
+                System.out.println("   " + tasks[taskIndex].getTypeIcon() + "[ ] "
+                        + tasks[taskIndex].getDescription());
+            } else if (command.startsWith("todo ")) {
+                String description = command.substring(5);
+                tasks[taskCount] = new Task(description, true);
+                taskCount++;
+                System.out.println(" Got it. I've added this task:");
+                System.out.println("  [T][ ] " + description);
+                System.out.println(" Now you have " + taskCount + " tasks in the list.");
             } else {
                 tasks[taskCount] = new Task(command);
                 taskCount++;

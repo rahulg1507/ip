@@ -97,3 +97,38 @@ Expected output:
     Bye. Hope to see you again soon!
     ____________________________________________________________
 
+## Add and list todo tasks
+Aim: Verify that todo tasks use the T prefix and report the task count when added.
+Inputs:
+    todo borrow book
+    todo buy bread
+    list
+    bye
+Expected output:
+    ____________________________________________________________
+     _   _    ___    _   _    _
+    | \ | |  / _ \  | | | |  / \
+    |  \| | | | | | | | | | / _ \
+    | |\  | | |_| |  \ V / / ___ \
+    |_| \_|  \___/    \_/ /_/   \_\
+    Hello! I'm Nova.
+    What can I do for you?
+    ____________________________________________________________
+    ____________________________________________________________
+     Got it. I've added this task:
+      [T][ ] borrow book
+     Now you have 1 tasks in the list.
+    ____________________________________________________________
+    ____________________________________________________________
+     Got it. I've added this task:
+      [T][ ] buy bread
+     Now you have 2 tasks in the list.
+    ____________________________________________________________
+    ____________________________________________________________
+     Here are the tasks in your list:
+     1.[T][ ] borrow book
+     2.[T][ ] buy bread
+    ____________________________________________________________
+    ____________________________________________________________
+    Bye. Hope to see you again soon!
+    ____________________________________________________________
