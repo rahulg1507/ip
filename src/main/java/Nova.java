@@ -37,25 +37,20 @@ public class Nova {
                 for (int i = 0; i < tasks.size(); i++) {
                     System.out.println(" " + (i + 1) + "." + tasks.get(i));
                 }
-                } else if (command.startsWith("mark ")) {
-                int taskNumber = Integer.parseInt(command.substring(5));
+                } else if (command.trim().equals("mark") || command.startsWith("mark ")) {
+                int taskNumber = getTaskNumber(command, "mark");
                 int taskIndex = getTaskIndex(taskNumber, tasks.size());
                 tasks.get(taskIndex).markAsDone();
                 System.out.println(" Nice! I've marked this task as done:");
                 System.out.println("   " + tasks.get(taskIndex));
-                } else if (command.startsWith("unmark ")) {
-                int taskNumber = Integer.parseInt(command.substring(7));
+                } else if (command.trim().equals("unmark") || command.startsWith("unmark ")) {
+                int taskNumber = getTaskNumber(command, "unmark");
                 int taskIndex = getTaskIndex(taskNumber, tasks.size());
                 tasks.get(taskIndex).markAsNotDone();
                 System.out.println(" OK, I've marked this task as not done yet:");
                 System.out.println("   " + tasks.get(taskIndex));
-                } else if (command.startsWith("delete ")) {
-                int taskNumber;
-                try {
-                    taskNumber = Integer.parseInt(command.substring(7).trim());
-                } catch (NumberFormatException exception) {
-                    throw new NovaException("Please provide a valid task number.");
-                }
+                } else if (command.trim().equals("delete") || command.startsWith("delete ")) {
+                int taskNumber = getTaskNumber(command, "delete");
                 int taskIndex = getTaskIndex(taskNumber, tasks.size());
                 Task deletedTask = tasks.remove(taskIndex);
                 System.out.println(" Noted. I've removed this task:");
@@ -73,6 +68,9 @@ public class Nova {
                 }
                 } else if (command.startsWith("deadline ")) {
                 int byIndex = command.indexOf(" /by ");
+                if (byIndex <= 9 || byIndex + 5 >= command.length()) {
+                    throw new NovaException("Please use: deadline DESCRIPTION /by DATE.");
+                }
                 String description = command.substring(9, byIndex);
                 String by = command.substring(byIndex + 5);
                 tasks.add(new Deadline(description, by));
@@ -82,6 +80,9 @@ public class Nova {
                 } else if (command.startsWith("event ")) {
                 int fromIndex = command.indexOf(" /from ");
                 int toIndex = command.indexOf(" /to ");
+                if (fromIndex <= 6 || toIndex <= fromIndex + 7 || toIndex + 5 >= command.length()) {
+                    throw new NovaException("Please use: event DESCRIPTION /from START /to END.");
+                }
                 String description = command.substring(6, fromIndex);
                 String from = command.substring(fromIndex + 7, toIndex);
                 String to = command.substring(toIndex + 5);
@@ -113,5 +114,21 @@ public class Nova {
             throw new NovaException("Please provide a valid task number.");
         }
         return taskNumber - 1;
+    }
+
+    /**
+     * Extracts a task number from a command and reports malformed values consistently.
+     *
+     * @param command the complete user command
+     * @param commandWord the command word before the task number
+     * @return the parsed one-based task number
+     * @throws NovaException if the task number is missing or not an integer
+     */
+    private static int getTaskNumber(String command, String commandWord) throws NovaException {
+        try {
+            return Integer.parseInt(command.substring(commandWord.length()).trim());
+        } catch (NumberFormatException exception) {
+            throw new NovaException("Please provide a valid task number.");
+        }
     }
 }

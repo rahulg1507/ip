@@ -48,42 +48,6 @@ Expected output:
     Bye. Hope to see you again soon!
     ____________________________________________________________
 
-## Add and list tasks
-Aim: Verify that entered tasks are stored and displayed in order.
-Inputs:
-    todo read book
-    todo return book
-    list
-    bye
-Expected output:
-    ____________________________________________________________
-     _   _    ___    _   _    _
-    | \ | |  / _ \  | | | |  / \
-    |  \| | | | | | | | | | / _ \
-    | |\  | | |_| |  \ V / / ___ \
-    |_| \_|  \___/    \_/ /_/   \_\
-    Hello! I'm Nova.
-    What can I do for you?
-    ____________________________________________________________
-    ____________________________________________________________
-     Got it. I've added this task:
-      [T][ ] read book
-     Now you have 1 tasks in the list.
-    ____________________________________________________________
-    ____________________________________________________________
-     Got it. I've added this task:
-      [T][ ] return book
-     Now you have 2 tasks in the list.
-    ____________________________________________________________
-    ____________________________________________________________
-     Here are the tasks in your list:
-     1.[T][ ] read book
-     2.[T][ ] return book
-    ____________________________________________________________
-    ____________________________________________________________
-    Bye. Hope to see you again soon!
-    ____________________________________________________________
-
 ## Mark and unmark tasks
 Aim: Verify that task completion status can be set and reversed.
 Inputs:
@@ -96,7 +60,6 @@ Inputs:
     bye
 Expected output:
     ____________________________________________________________
-
      _   _    ___    _   _    _
     | \ | |  / _ \  | | | |  / \
     |  \| | | | | | | | | | / _ \
@@ -147,6 +110,25 @@ Inputs:
     bye
 Expected output:
     ____________________________________________________________
+     _   _    ___    _   _    _
+    | \ | |  / _ \  | | | |  / \
+    |  \| | | | | | | | | | / _ \
+    | |\  | | |_| |  \ V / / ___ \
+    |_| \_|  \___/    \_/ /_/   \_\
+    Hello! I'm Nova.
+    What can I do for you?
+    ____________________________________________________________
+    ____________________________________________________________
+     Got it. I've added this task:
+      [T][ ] read book
+     Now you have 1 tasks in the list.
+    ____________________________________________________________
+    ____________________________________________________________
+     Got it. I've added this task:
+      [T][ ] return book
+     Now you have 2 tasks in the list.
+    ____________________________________________________________
+    ____________________________________________________________
      Noted. I've removed this task:
        [T][ ] read book
      Now you have 1 tasks in the list.
@@ -157,6 +139,132 @@ Expected output:
     ____________________________________________________________
      Here are the tasks in your list:
      1.[T][ ] return book
+    ____________________________________________________________
+    ____________________________________________________________
+    Bye. Hope to see you again soon!
+    ____________________________________________________________
+
+## Handle malformed task and date commands
+Aim: Verify that malformed task numbers and deadline or event formats display errors and do not add or change tasks.
+Inputs:
+    todo read book
+    mark 0
+    mark 3
+    unmark abc
+    unmark 0
+    delete
+    delete -1
+    delete abc
+    deadline read book
+    deadline /by Friday
+    event meeting /from Monday
+    event meeting /to Tuesday
+    list
+    bye
+Expected output:
+    ____________________________________________________________
+     _   _    ___    _   _    _
+    | \ | |  / _ \  | | | |  / \
+    |  \| | | | | | | | | | / _ \
+    | |\  | | |_| |  \ V / / ___ \
+    |_| \_|  \___/    \_/ /_/   \_\
+    Hello! I'm Nova.
+    What can I do for you?
+    ____________________________________________________________
+    ____________________________________________________________
+     Got it. I've added this task:
+      [T][ ] read book
+     Now you have 1 tasks in the list.
+    ____________________________________________________________
+    ____________________________________________________________
+     Please provide a valid task number.
+    ____________________________________________________________
+    ____________________________________________________________
+     Please provide a valid task number.
+    ____________________________________________________________
+    ____________________________________________________________
+     Please provide a valid task number.
+    ____________________________________________________________
+    ____________________________________________________________
+     Please provide a valid task number.
+    ____________________________________________________________
+    ____________________________________________________________
+     Please provide a valid task number.
+    ____________________________________________________________
+    ____________________________________________________________
+     Please provide a valid task number.
+    ____________________________________________________________
+    ____________________________________________________________
+     Please provide a valid task number.
+    ____________________________________________________________
+    ____________________________________________________________
+     Please use: deadline DESCRIPTION /by DATE.
+    ____________________________________________________________
+    ____________________________________________________________
+     Please use: deadline DESCRIPTION /by DATE.
+    ____________________________________________________________
+    ____________________________________________________________
+     Please use: event DESCRIPTION /from START /to END.
+    ____________________________________________________________
+    ____________________________________________________________
+     Please use: event DESCRIPTION /from START /to END.
+    ____________________________________________________________
+    ____________________________________________________________
+     Here are the tasks in your list:
+     1.[T][ ] read book
+    ____________________________________________________________
+    ____________________________________________________________
+    Bye. Hope to see you again soon!
+    ____________________________________________________________
+
+## Maintain task positions across task types
+Aim: Verify that deleting a middle task keeps the remaining task order and positions correct across todo, deadline, and event tasks.
+Inputs:
+    todo read book
+    deadline submit assignment /by Friday
+    event project meeting /from Monday 2pm /to 4pm
+    delete 2
+    mark 2
+    list
+    bye
+Expected output:
+    ____________________________________________________________
+     _   _    ___    _   _    _
+    | \ | |  / _ \  | | | |  / \
+    |  \| | | | | | | | | | / _ \
+    | |\  | | |_| |  \ V / / ___ \
+    |_| \_|  \___/    \_/ /_/   \_\
+    Hello! I'm Nova.
+    What can I do for you?
+    ____________________________________________________________
+    ____________________________________________________________
+     Got it. I've added this task:
+      [T][ ] read book
+     Now you have 1 tasks in the list.
+    ____________________________________________________________
+    ____________________________________________________________
+     Got it. I've added this task:
+      [D][ ] submit assignment (by: Friday)
+     Now you have 2 tasks in the list.
+    ____________________________________________________________
+    ____________________________________________________________
+     Got it. I've added this task:
+      [E][ ] project meeting (from: Monday 2pm to: 4pm)
+     Now you have 3 tasks in the list.
+    ____________________________________________________________
+    ____________________________________________________________
+     Noted. I've removed this task:
+       [D][ ] submit assignment (by: Friday)
+     Now you have 2 tasks in the list.
+    ____________________________________________________________
+    ____________________________________________________________
+     Nice! I've marked this task as done:
+       [E][X] project meeting (from: Monday 2pm to: 4pm)
+    ____________________________________________________________
+    ____________________________________________________________
+     Here are the tasks in your list:
+     1.[T][ ] read book
+     2.[E][X] project meeting (from: Monday 2pm to: 4pm)
     ____________________________________________________________
     ____________________________________________________________
     Bye. Hope to see you again soon!
