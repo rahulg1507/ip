@@ -96,6 +96,7 @@ Inputs:
     bye
 Expected output:
     ____________________________________________________________
+
      _   _    ___    _   _    _
     | \ | |  / _ \  | | | |  / \
     |  \| | | | | | | | | | / _ \
@@ -130,6 +131,32 @@ Expected output:
      Here are the tasks in your list:
      1.[T][X] read book
      2.[T][ ] return book
+    ____________________________________________________________
+    ____________________________________________________________
+    Bye. Hope to see you again soon!
+    ____________________________________________________________
+
+## Delete tasks
+Aim: Verify that a task can be removed by its one-based position and that invalid task numbers produce an error without changing the list.
+Inputs:
+    todo read book
+    todo return book
+    delete 1
+    delete 3
+    list
+    bye
+Expected output:
+    ____________________________________________________________
+     Noted. I've removed this task:
+       [T][ ] read book
+     Now you have 1 tasks in the list.
+    ____________________________________________________________
+    ____________________________________________________________
+     Please provide a valid task number.
+    ____________________________________________________________
+    ____________________________________________________________
+     Here are the tasks in your list:
+     1.[T][ ] return book
     ____________________________________________________________
     ____________________________________________________________
     Bye. Hope to see you again soon!

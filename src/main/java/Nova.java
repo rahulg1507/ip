@@ -39,16 +39,32 @@ public class Nova {
                 }
                 } else if (command.startsWith("mark ")) {
                 int taskNumber = Integer.parseInt(command.substring(5));
-                int taskIndex = taskNumber - 1;
+                int taskIndex = getTaskIndex(taskNumber, taskCount);
                 tasks[taskIndex].markAsDone();
                 System.out.println(" Nice! I've marked this task as done:");
                 System.out.println("   " + tasks[taskIndex]);
                 } else if (command.startsWith("unmark ")) {
                 int taskNumber = Integer.parseInt(command.substring(7));
-                int taskIndex = taskNumber - 1;
+                int taskIndex = getTaskIndex(taskNumber, taskCount);
                 tasks[taskIndex].markAsNotDone();
                 System.out.println(" OK, I've marked this task as not done yet:");
                 System.out.println("   " + tasks[taskIndex]);
+                } else if (command.startsWith("delete ")) {
+                int taskNumber;
+                try {
+                    taskNumber = Integer.parseInt(command.substring(7).trim());
+                } catch (NumberFormatException exception) {
+                    throw new NovaException("Please provide a valid task number.");
+                }
+                int taskIndex = getTaskIndex(taskNumber, taskCount);
+                Task deletedTask = tasks[taskIndex];
+                for (int i = taskIndex; i < taskCount - 1; i++) {
+                    tasks[i] = tasks[i + 1];
+                }
+                tasks[--taskCount] = null;
+                System.out.println(" Noted. I've removed this task:");
+                System.out.println("   " + deletedTask);
+                System.out.println(" Now you have " + taskCount + " tasks in the list.");
                 } else if (command.trim().equals("todo") || command.startsWith("todo ")) {
                 String description = command.trim().equals("todo") ? "" : command.substring(5).trim();
                 if (description.isEmpty()) {
@@ -89,5 +105,20 @@ public class Nova {
 
             System.out.println(divider);
         }
+    }
+
+    /**
+     * Converts a one-based task number into an array index after validating it.
+     *
+     * @param taskNumber the number entered by the user
+     * @param taskCount the number of tasks currently stored
+     * @return the zero-based array index
+     * @throws NovaException if the number does not identify an existing task
+     */
+    private static int getTaskIndex(int taskNumber, int taskCount) throws NovaException {
+        if (taskNumber < 1 || taskNumber > taskCount) {
+            throw new NovaException("Please provide a valid task number.");
+        }
+        return taskNumber - 1;
     }
 }
