@@ -14,15 +14,9 @@ public class Event extends Task {
      * @param to the plain-text end date and time
      */
     public Event(String description, String from, String to) {
-        super(description);
+        super(description, TaskType.EVENT);
         this.from = from;
         this.to = to;
-    }
-
-    /** @return the event type prefix */
-    @Override
-    public String getTypeIcon() {
-        return "[E]";
     }
 
     /** @return the event description with its time-range suffix */
@@ -38,6 +32,6 @@ public class Event extends Task {
      */
     @Override
     public String toString() {
-        return "[E]" + super.toString() + " (from: " + from + " to: " + to + ")";
+        return super.toString() + " (from: " + from + " to: " + to + ")";
     }
 }

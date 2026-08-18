@@ -6,8 +6,11 @@ public class Task {
     /** The text describing this task. */
     protected String description;
 
-    /** Whether this task has been completed. */
-    protected boolean isDone;
+    /** The kind of this task. */
+    protected final TaskType taskType;
+
+    /** The completion state of this task. */
+    protected TaskStatus status;
 
     /**
      * Creates an incomplete task with the given description.
@@ -15,18 +18,29 @@ public class Task {
      * @param description the text describing the task
      */
     public Task(String description) {
+        this(description, TaskType.BASIC);
+    }
+
+    /**
+     * Creates an incomplete task of the given type.
+     *
+     * @param description the text describing the task
+     * @param taskType the kind of task being created
+     */
+    protected Task(String description, TaskType taskType) {
         this.description = description;
-        this.isDone = false;
+        this.taskType = taskType;
+        this.status = TaskStatus.NOT_DONE;
     }
 
     /** Marks this task as completed. */
     public void markAsDone() {
-        isDone = true;
+        status = TaskStatus.DONE;
     }
 
     /** Marks this task as incomplete. */
     public void markAsNotDone() {
-        isDone = false;
+        status = TaskStatus.NOT_DONE;
     }
 
     /**
@@ -41,10 +55,10 @@ public class Task {
     /**
      * Returns the type prefix for this task.
      *
-     * @return an empty string for a basic task
+     * @return the task type's display prefix
      */
     public String getTypeIcon() {
-        return "";
+        return taskType.getDisplayIcon();
     }
 
     /**
@@ -59,10 +73,10 @@ public class Task {
     /**
      * Returns the completion marker used in the task display.
      *
-     * @return {@code "X"} when done, or a space when not done
+     * @return the display marker for the current task status
      */
     public String getStatusIcon() {
-        return isDone ? "X" : " ";
+        return status.getDisplayIcon();
     }
 
     /**
@@ -72,6 +86,6 @@ public class Task {
      */
     @Override
     public String toString() {
-        return "[" + getStatusIcon() + "] " + description;
+        return getTypeIcon() + "[" + getStatusIcon() + "] " + description;
     }
 }

@@ -10,14 +10,8 @@ public class Deadline extends Task {
      * @param by the plain-text deadline
      */
     public Deadline(String description, String by) {
-        super(description);
+        super(description, TaskType.DEADLINE);
         this.by = by;
-    }
-
-    /** @return the deadline type prefix */
-    @Override
-    public String getTypeIcon() {
-        return "[D]";
     }
 
     /** @return the task description with its deadline suffix */
@@ -33,6 +27,6 @@ public class Deadline extends Task {
      */
     @Override
     public String toString() {
-        return "[D]" + super.toString() + " (by: " + by + ")";
+        return super.toString() + " (by: " + by + ")";
     }
 }
