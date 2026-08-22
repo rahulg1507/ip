@@ -157,6 +157,8 @@ Inputs:
     delete abc
     deadline read book
     deadline /by Friday
+    deadline submit assignment /by 2019-02-30
+    deadline submit assignment /by 15-10-2019
     event meeting /from Monday
     event meeting /to Tuesday
     list
@@ -202,6 +204,12 @@ Expected output:
     ____________________________________________________________
     ____________________________________________________________
      Please use: deadline DESCRIPTION /by DATE.
+    ____________________________________________________________
+    ____________________________________________________________
+     Please use a valid date in yyyy-MM-dd format.
+    ____________________________________________________________
+    ____________________________________________________________
+     Please use a valid date in yyyy-MM-dd format.
     ____________________________________________________________
     ____________________________________________________________
      Please use: event DESCRIPTION /from START /to END.
