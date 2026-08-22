@@ -4,7 +4,6 @@ import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
-import java.util.ArrayList;
 import java.util.Scanner;
 
 /**
@@ -33,7 +32,7 @@ public class Nova {
         System.out.println("What can I do for you?");
         System.out.println(divider);
 
-        ArrayList<Task> tasks = loadTasks();
+        TaskList tasks = loadTasks();
         Scanner scanner = new Scanner(System.in);
         while (scanner.hasNextLine()) {
             String command = scanner.nextLine();
@@ -152,11 +151,11 @@ public class Nova {
      * @param tasks the task list to save
      * @throws NovaException if the storage file cannot be written
      */
-    private static void saveTasks(ArrayList<Task> tasks) throws NovaException {
+    private static void saveTasks(TaskList tasks) throws NovaException {
         Path temporaryFile = TASK_FILE.resolveSibling(TASK_FILE.getFileName() + ".tmp");
         try {
             Files.createDirectories(TASK_FILE.getParent());
-            ArrayList<String> lines = new ArrayList<>();
+            java.util.ArrayList<String> lines = new java.util.ArrayList<>();
             for (Task task : tasks) {
                 lines.add(task.toStorageString());
             }
@@ -184,7 +183,7 @@ public class Nova {
      * @param task the task to add
      * @throws NovaException if the updated list cannot be saved
      */
-    private static void addTaskAndSave(ArrayList<Task> tasks, Task task) throws NovaException {
+    private static void addTaskAndSave(TaskList tasks, Task task) throws NovaException {
         tasks.add(task);
         try {
             saveTasks(tasks);
@@ -199,8 +198,8 @@ public class Nova {
      *
      * @return the tasks found in storage, or an empty list when no file exists
      */
-    private static ArrayList<Task> loadTasks() {
-        ArrayList<Task> tasks = new ArrayList<>();
+    private static TaskList loadTasks() {
+        TaskList tasks = new TaskList();
         if (!Files.exists(TASK_FILE)) {
             return tasks;
         }
@@ -217,7 +216,7 @@ public class Nova {
             }
         } catch (IOException exception) {
             System.out.println(" Warning: Unable to read saved tasks. Starting with an empty list.");
-            return new ArrayList<>();
+            return new TaskList();
         }
 
         if (corruptedLineCount > 0) {
@@ -233,7 +232,7 @@ public class Nova {
      * @param tasks the task list being restored
      * @param line the persisted task line
      */
-    private static boolean addTaskFromStorageLine(ArrayList<Task> tasks, String line) {
+    private static boolean addTaskFromStorageLine(TaskList tasks, String line) {
         String[] parts = line.split("\\s*\\|\\s*", -1);
         if (parts.length < 3 || !isValidStatus(parts[1]) || parts[2].isBlank()) {
             return false;
