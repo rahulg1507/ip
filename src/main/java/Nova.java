@@ -1,7 +1,3 @@
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.StandardCopyOption;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 import java.util.Scanner;
@@ -10,9 +6,6 @@ import java.util.Scanner;
  * Starts the Nova chatbot application.
  */
 public class Nova {
-    /** The file used to store the current task list. */
-    private static final Path TASK_FILE = Path.of("data", "nova.txt");
-
     /**
      * Starts the Nova chatbot and processes commands until the input ends.
      *
@@ -32,7 +25,8 @@ public class Nova {
         System.out.println("What can I do for you?");
         System.out.println(divider);
 
-        TaskList tasks = loadTasks();
+        Storage storage = new Storage();
+        TaskList tasks = storage.load();
         Scanner scanner = new Scanner(System.in);
         while (scanner.hasNextLine()) {
             String command = scanner.nextLine();
@@ -63,7 +57,7 @@ public class Nova {
                 int taskIndex = getTaskIndex(taskNumber, tasks.size());
                 tasks.get(taskIndex).markAsDone();
                 try {
-                    saveTasks(tasks);
+                    storage.save(tasks);
                 } catch (NovaException exception) {
                     tasks.get(taskIndex).markAsNotDone();
                     throw exception;
@@ -75,7 +69,7 @@ public class Nova {
                 int taskIndex = getTaskIndex(taskNumber, tasks.size());
                 tasks.get(taskIndex).markAsNotDone();
                 try {
-                    saveTasks(tasks);
+                    storage.save(tasks);
                 } catch (NovaException exception) {
                     tasks.get(taskIndex).markAsDone();
                     throw exception;
@@ -87,7 +81,7 @@ public class Nova {
                 int taskIndex = getTaskIndex(taskNumber, tasks.size());
                 Task deletedTask = tasks.remove(taskIndex);
                 try {
-                    saveTasks(tasks);
+                    storage.save(tasks);
                 } catch (NovaException exception) {
                     tasks.add(taskIndex, deletedTask);
                     throw exception;
@@ -100,7 +94,7 @@ public class Nova {
                 if (description.isEmpty()) {
                         throw new NovaException("Please add a description after 'todo'.");
                 } else {
-                    addTaskAndSave(tasks, new Todo(description));
+                    addTaskAndSave(storage, tasks, new Todo(description));
                     System.out.println(" Got it. I've added this task:");
                     System.out.println("  " + tasks.get(tasks.size() - 1));
                     System.out.println(" Now you have " + tasks.size() + " tasks in the list.");
@@ -117,7 +111,7 @@ public class Nova {
                 } catch (DateTimeParseException exception) {
                     throw new NovaException("Please use a valid date in yyyy-MM-dd format.");
                 }
-                addTaskAndSave(tasks, new Deadline(description, by));
+                addTaskAndSave(storage, tasks, new Deadline(description, by));
                 System.out.println(" Got it. I've added this task:");
                 System.out.println("  " + tasks.get(tasks.size() - 1));
                 System.out.println(" Now you have " + tasks.size() + " tasks in the list.");
@@ -130,7 +124,7 @@ public class Nova {
                 String description = command.substring(6, fromIndex);
                 String from = command.substring(fromIndex + 7, toIndex);
                 String to = command.substring(toIndex + 5);
-                addTaskAndSave(tasks, new Event(description, from, to));
+                addTaskAndSave(storage, tasks, new Event(description, from, to));
                 System.out.println(" Got it. I've added this task:");
                 System.out.println("  " + tasks.get(tasks.size() - 1));
                 System.out.println(" Now you have " + tasks.size() + " tasks in the list.");
@@ -146,133 +140,20 @@ public class Nova {
     }
 
     /**
-     * Saves the current task list to the configured storage file.
-     *
-     * @param tasks the task list to save
-     * @throws NovaException if the storage file cannot be written
-     */
-    private static void saveTasks(TaskList tasks) throws NovaException {
-        Path temporaryFile = TASK_FILE.resolveSibling(TASK_FILE.getFileName() + ".tmp");
-        try {
-            Files.createDirectories(TASK_FILE.getParent());
-            java.util.ArrayList<String> lines = new java.util.ArrayList<>();
-            for (Task task : tasks) {
-                lines.add(task.toStorageString());
-            }
-            Files.write(temporaryFile, lines);
-            try {
-                Files.move(temporaryFile, TASK_FILE, StandardCopyOption.ATOMIC_MOVE,
-                        StandardCopyOption.REPLACE_EXISTING);
-            } catch (IOException exception) {
-                Files.move(temporaryFile, TASK_FILE, StandardCopyOption.REPLACE_EXISTING);
-            }
-        } catch (IOException exception) {
-            try {
-                Files.deleteIfExists(temporaryFile);
-            } catch (IOException ignoredException) {
-                // Preserve the original save failure for the user.
-            }
-            throw new NovaException("Unable to save tasks.");
-        }
-    }
-
-    /**
      * Adds a task and rolls back the addition if persistence fails.
      *
      * @param tasks the task list to update
      * @param task the task to add
      * @throws NovaException if the updated list cannot be saved
      */
-    private static void addTaskAndSave(TaskList tasks, Task task) throws NovaException {
+    private static void addTaskAndSave(Storage storage, TaskList tasks, Task task) throws NovaException {
         tasks.add(task);
         try {
-            saveTasks(tasks);
+            storage.save(tasks);
         } catch (NovaException exception) {
             tasks.remove(tasks.size() - 1);
             throw exception;
         }
-    }
-
-    /**
-     * Loads tasks from the configured storage file when it exists.
-     *
-     * @return the tasks found in storage, or an empty list when no file exists
-     */
-    private static TaskList loadTasks() {
-        TaskList tasks = new TaskList();
-        if (!Files.exists(TASK_FILE)) {
-            return tasks;
-        }
-
-        int corruptedLineCount = 0;
-        try {
-            for (String line : Files.readAllLines(TASK_FILE)) {
-                if (!line.isBlank()) {
-                    boolean isTaskLoaded = addTaskFromStorageLine(tasks, line);
-                    if (!isTaskLoaded) {
-                        corruptedLineCount++;
-                    }
-                }
-            }
-        } catch (IOException exception) {
-            System.out.println(" Warning: Unable to read saved tasks. Starting with an empty list.");
-            return new TaskList();
-        }
-
-        if (corruptedLineCount > 0) {
-            System.out.println(" Warning: Ignored " + corruptedLineCount
-                    + " corrupted task record(s).");
-        }
-        return tasks;
-    }
-
-    /**
-     * Adds one valid persisted task line to the task list.
-     *
-     * @param tasks the task list being restored
-     * @param line the persisted task line
-     */
-    private static boolean addTaskFromStorageLine(TaskList tasks, String line) {
-        String[] parts = line.split("\\s*\\|\\s*", -1);
-        if (parts.length < 3 || !isValidStatus(parts[1]) || parts[2].isBlank()) {
-            return false;
-        }
-
-        String type = parts[0];
-        String description = parts[2];
-        Task task;
-        if ("T".equals(type) && parts.length == 3) {
-            task = new Todo(description);
-        } else if ("D".equals(type) && parts.length == 4 && !parts[3].isBlank()) {
-            try {
-                task = new Deadline(description, LocalDate.parse(parts[3]));
-            } catch (DateTimeParseException exception) {
-                return false;
-            }
-        } else if ("E".equals(type) && parts.length == 5
-                && !parts[3].isBlank() && !parts[4].isBlank()) {
-            task = new Event(description, parts[3], parts[4]);
-        } else if ("B".equals(type) && parts.length == 3) {
-            task = new Task(description);
-        } else {
-            return false;
-        }
-
-        if ("1".equals(parts[1])) {
-            task.markAsDone();
-        }
-        tasks.add(task);
-        return true;
-    }
-
-    /**
-     * Returns whether a persisted completion value is supported.
-     *
-     * @param status the persisted completion value
-     * @return true if the value represents an incomplete or completed task
-     */
-    private static boolean isValidStatus(String status) {
-        return "0".equals(status) || "1".equals(status);
     }
 
     /** Parses a user-supplied ISO date and converts failures to chatbot errors. */
