@@ -1,3 +1,5 @@
+package nova.task;
+
 /**
  * Represents the supported kinds of tasks and their display prefixes.
  */

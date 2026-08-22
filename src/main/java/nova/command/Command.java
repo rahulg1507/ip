@@ -1,3 +1,10 @@
+package nova.command;
+
+import nova.exception.NovaException;
+import nova.storage.Storage;
+import nova.task.TaskList;
+import nova.ui.Ui;
+
 /** A command that can be executed by Nova. */
 public abstract class Command {
     /** Executes this command using the application's collaborators. */

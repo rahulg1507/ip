@@ -1,3 +1,5 @@
+package nova.exception;
+
 /**
  * Signals an invalid command or other input error in the Nova chatbot.
  */

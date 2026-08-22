@@ -1,34 +1,7 @@
-/**
- * Starts the Nova chatbot application.
- */
+/** Compatibility launcher for tools that expect a default-package Nova class. */
 public class Nova {
-    /**
-     * Starts the Nova chatbot and processes commands until the input ends.
-     *
-     * @param args command-line arguments, which are not used
-     */
+    /** Delegates to the packaged application entry point. */
     public static void main(String[] args) {
-        Ui ui = new Ui();
-        ui.showGreeting();
-        Storage storage = new Storage();
-        TaskList tasks = storage.load();
-        Parser parser = new Parser();
-        CommandHandler handler = new CommandHandler(storage, tasks, ui);
-        while (ui.hasNextCommand()) {
-            String command = ui.readCommand();
-            ui.showDivider();
-
-            try {
-                Parser.ParsedCommand parsedCommand = parser.parse(command);
-                if (handler.execute(parsedCommand)) {
-                break;
-                }
-            } catch (NovaException exception) {
-                ui.showError(exception);
-            }
-
-            ui.showDivider();
-        }
+        nova.Nova.main(args);
     }
-
 }

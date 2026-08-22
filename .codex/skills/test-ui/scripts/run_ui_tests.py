@@ -44,7 +44,7 @@ def parse_cases(plan_path):
 
 def compile_program(project_root, classes_dir):
     """Compile all Nova source files."""
-    java_files = sorted((project_root / "src/main/java").glob("*.java"))
+    java_files = sorted((project_root / "src/main/java").rglob("*.java"))
     result = subprocess.run(
         ["javac", "-d", str(classes_dir), *(str(path) for path in java_files)],
         text=True,
@@ -76,12 +76,18 @@ def main():
         return 2
 
     for case in cases:
+        project_root = Path.cwd()
+        task_file = project_root / "data" / "nova.txt"
+        temporary_task_file = project_root / "data" / "nova.txt.tmp"
+        task_file.unlink(missing_ok=True)
+        temporary_task_file.unlink(missing_ok=True)
         result = subprocess.run(
-            ["java", "-cp", str(classes_dir), "Nova"],
+            ["java", "-cp", str(classes_dir), "nova.Nova"],
             input=case["input"],
             text=True,
             capture_output=True,
             check=False,
+            cwd=project_root,
         )
         actual = normalize(result.stdout)
         if result.returncode:

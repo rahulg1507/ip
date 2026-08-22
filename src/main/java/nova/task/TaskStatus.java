@@ -1,3 +1,5 @@
+package nova.task;
+
 /**
  * Represents the completion state of a task.
  */

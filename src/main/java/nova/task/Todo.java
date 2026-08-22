@@ -1,3 +1,5 @@
+package nova.task;
+
 /** Represents a todo task. */
 public class Todo extends Task {
     /**
