@@ -1,5 +1,4 @@
 import java.time.LocalDate;
-import java.time.format.DateTimeParseException;
 import java.util.Scanner;
 
 /**
@@ -27,33 +26,38 @@ public class Nova {
 
         Storage storage = new Storage();
         TaskList tasks = storage.load();
+        Parser parser = new Parser();
         Scanner scanner = new Scanner(System.in);
         while (scanner.hasNextLine()) {
             String command = scanner.nextLine();
             System.out.println(divider);
 
             try {
-                if (command.equals("bye")) {
+                Parser.ParsedCommand parsedCommand = parser.parse(command);
+                if (parsedCommand.type() == Parser.CommandType.EXIT) {
                 System.out.println("Bye. Hope to see you again soon!");
                 System.out.println(divider);
                 break;
                 }
 
-                if (command.equals("list")) {
+                switch (parsedCommand.type()) {
+                case LIST -> {
                 System.out.println(" Here are the tasks in your list:");
                 for (int i = 0; i < tasks.size(); i++) {
                     System.out.println(" " + (i + 1) + "." + tasks.get(i));
                 }
-                } else if (command.startsWith("on ")) {
-                LocalDate date = parseDate(command.substring(3).trim());
+                }
+                case ON -> {
+                LocalDate date = parsedCommand.date();
                 System.out.println(" Tasks on " + date + ":");
                 for (Task task : tasks) {
                     if (occursOn(task, date)) {
                         System.out.println(" " + task);
                     }
                 }
-                } else if (command.trim().equals("mark") || command.startsWith("mark ")) {
-                int taskNumber = getTaskNumber(command, "mark");
+                }
+                case MARK -> {
+                int taskNumber = parsedCommand.taskNumber();
                 int taskIndex = getTaskIndex(taskNumber, tasks.size());
                 tasks.get(taskIndex).markAsDone();
                 try {
@@ -64,8 +68,9 @@ public class Nova {
                 }
                 System.out.println(" Nice! I've marked this task as done:");
                 System.out.println("   " + tasks.get(taskIndex));
-                } else if (command.trim().equals("unmark") || command.startsWith("unmark ")) {
-                int taskNumber = getTaskNumber(command, "unmark");
+                }
+                case UNMARK -> {
+                int taskNumber = parsedCommand.taskNumber();
                 int taskIndex = getTaskIndex(taskNumber, tasks.size());
                 tasks.get(taskIndex).markAsNotDone();
                 try {
@@ -76,8 +81,9 @@ public class Nova {
                 }
                 System.out.println(" OK, I've marked this task as not done yet:");
                 System.out.println("   " + tasks.get(taskIndex));
-                } else if (command.trim().equals("delete") || command.startsWith("delete ")) {
-                int taskNumber = getTaskNumber(command, "delete");
+                }
+                case DELETE -> {
+                int taskNumber = parsedCommand.taskNumber();
                 int taskIndex = getTaskIndex(taskNumber, tasks.size());
                 Task deletedTask = tasks.remove(taskIndex);
                 try {
@@ -89,47 +95,27 @@ public class Nova {
                 System.out.println(" Noted. I've removed this task:");
                 System.out.println("   " + deletedTask);
                 System.out.println(" Now you have " + tasks.size() + " tasks in the list.");
-                } else if (command.trim().equals("todo") || command.startsWith("todo ")) {
-                String description = command.trim().equals("todo") ? "" : command.substring(5).trim();
-                if (description.isEmpty()) {
-                        throw new NovaException("Please add a description after 'todo'.");
-                } else {
-                    addTaskAndSave(storage, tasks, new Todo(description));
-                    System.out.println(" Got it. I've added this task:");
-                    System.out.println("  " + tasks.get(tasks.size() - 1));
-                    System.out.println(" Now you have " + tasks.size() + " tasks in the list.");
                 }
-                } else if (command.startsWith("deadline ")) {
-                int byIndex = command.indexOf(" /by ");
-                if (byIndex <= 9 || byIndex + 5 >= command.length()) {
-                    throw new NovaException("Please use: deadline DESCRIPTION /by DATE.");
-                }
-                String description = command.substring(9, byIndex);
-                LocalDate by;
-                try {
-                    by = parseDate(command.substring(byIndex + 5));
-                } catch (DateTimeParseException exception) {
-                    throw new NovaException("Please use a valid date in yyyy-MM-dd format.");
-                }
-                addTaskAndSave(storage, tasks, new Deadline(description, by));
+                case TODO -> {
+                addTaskAndSave(storage, tasks, new Todo(parsedCommand.description()));
                 System.out.println(" Got it. I've added this task:");
                 System.out.println("  " + tasks.get(tasks.size() - 1));
                 System.out.println(" Now you have " + tasks.size() + " tasks in the list.");
-                } else if (command.startsWith("event ")) {
-                int fromIndex = command.indexOf(" /from ");
-                int toIndex = command.indexOf(" /to ");
-                if (fromIndex <= 6 || toIndex <= fromIndex + 7 || toIndex + 5 >= command.length()) {
-                    throw new NovaException("Please use: event DESCRIPTION /from START /to END.");
                 }
-                String description = command.substring(6, fromIndex);
-                String from = command.substring(fromIndex + 7, toIndex);
-                String to = command.substring(toIndex + 5);
-                addTaskAndSave(storage, tasks, new Event(description, from, to));
+                case DEADLINE -> {
+                addTaskAndSave(storage, tasks, new Deadline(parsedCommand.description(), parsedCommand.date()));
                 System.out.println(" Got it. I've added this task:");
                 System.out.println("  " + tasks.get(tasks.size() - 1));
                 System.out.println(" Now you have " + tasks.size() + " tasks in the list.");
-                } else {
-                    throw new NovaException("I don't recognize that command.");
+                }
+                case EVENT -> {
+                addTaskAndSave(storage, tasks, new Event(parsedCommand.description(),
+                        parsedCommand.from(), parsedCommand.to()));
+                System.out.println(" Got it. I've added this task:");
+                System.out.println("  " + tasks.get(tasks.size() - 1));
+                System.out.println(" Now you have " + tasks.size() + " tasks in the list.");
+                }
+                case EXIT -> { }
                 }
             } catch (NovaException exception) {
                 System.out.println(" " + exception.getMessage());
@@ -153,15 +139,6 @@ public class Nova {
         } catch (NovaException exception) {
             tasks.remove(tasks.size() - 1);
             throw exception;
-        }
-    }
-
-    /** Parses a user-supplied ISO date and converts failures to chatbot errors. */
-    private static LocalDate parseDate(String value) throws NovaException {
-        try {
-            return LocalDate.parse(value);
-        } catch (DateTimeParseException exception) {
-            throw new NovaException("Please use a valid date in yyyy-MM-dd format.");
         }
     }
 
@@ -192,19 +169,4 @@ public class Nova {
         return taskNumber - 1;
     }
 
-    /**
-     * Extracts a task number from a command and reports malformed values consistently.
-     *
-     * @param command the complete user command
-     * @param commandWord the command word before the task number
-     * @return the parsed one-based task number
-     * @throws NovaException if the task number is missing or not an integer
-     */
-    private static int getTaskNumber(String command, String commandWord) throws NovaException {
-        try {
-            return Integer.parseInt(command.substring(commandWord.length()).trim());
-        } catch (NumberFormatException exception) {
-            throw new NovaException("Please provide a valid task number.");
-        }
-    }
 }
