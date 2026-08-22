@@ -51,6 +51,14 @@ public class Nova {
                 for (int i = 0; i < tasks.size(); i++) {
                     System.out.println(" " + (i + 1) + "." + tasks.get(i));
                 }
+                } else if (command.startsWith("on ")) {
+                LocalDate date = parseDate(command.substring(3).trim());
+                System.out.println(" Tasks on " + date + ":");
+                for (Task task : tasks) {
+                    if (occursOn(task, date)) {
+                        System.out.println(" " + task);
+                    }
+                }
                 } else if (command.trim().equals("mark") || command.startsWith("mark ")) {
                 int taskNumber = getTaskNumber(command, "mark");
                 int taskIndex = getTaskIndex(taskNumber, tasks.size());
@@ -106,7 +114,7 @@ public class Nova {
                 String description = command.substring(9, byIndex);
                 LocalDate by;
                 try {
-                    by = LocalDate.parse(command.substring(byIndex + 5));
+                    by = parseDate(command.substring(byIndex + 5));
                 } catch (DateTimeParseException exception) {
                     throw new NovaException("Please use a valid date in yyyy-MM-dd format.");
                 }
@@ -266,6 +274,27 @@ public class Nova {
      */
     private static boolean isValidStatus(String status) {
         return "0".equals(status) || "1".equals(status);
+    }
+
+    /** Parses a user-supplied ISO date and converts failures to chatbot errors. */
+    private static LocalDate parseDate(String value) throws NovaException {
+        try {
+            return LocalDate.parse(value);
+        } catch (DateTimeParseException exception) {
+            throw new NovaException("Please use a valid date in yyyy-MM-dd format.");
+        }
+    }
+
+    /** Returns whether a deadline or event occurs on the requested date. */
+    private static boolean occursOn(Task task, LocalDate date) {
+        if (task instanceof Deadline deadline) {
+            return deadline.by.equals(date);
+        }
+        if (task instanceof Event event) {
+            String dateText = date.toString();
+            return event.from.contains(dateText) || event.to.contains(dateText);
+        }
+        return false;
     }
 
     /**

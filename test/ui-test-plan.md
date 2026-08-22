@@ -159,6 +159,7 @@ Inputs:
     deadline /by Friday
     deadline submit assignment /by 2019-02-30
     deadline submit assignment /by 15-10-2019
+    on 2019/10/15
     event meeting /from Monday
     event meeting /to Tuesday
     list
@@ -204,6 +205,9 @@ Expected output:
     ____________________________________________________________
     ____________________________________________________________
      Please use: deadline DESCRIPTION /by DATE.
+    ____________________________________________________________
+    ____________________________________________________________
+     Please use a valid date in yyyy-MM-dd format.
     ____________________________________________________________
     ____________________________________________________________
      Please use a valid date in yyyy-MM-dd format.
