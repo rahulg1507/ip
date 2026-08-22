@@ -30,7 +30,7 @@ public class Nova {
         System.out.println("What can I do for you?");
         System.out.println(divider);
 
-        ArrayList<Task> tasks = new ArrayList<>();
+        ArrayList<Task> tasks = loadTasks();
         Scanner scanner = new Scanner(System.in);
         while (scanner.hasNextLine()) {
             String command = scanner.nextLine();
@@ -135,6 +135,60 @@ public class Nova {
         } catch (IOException exception) {
             throw new NovaException("Unable to save tasks.");
         }
+    }
+
+    /**
+     * Loads tasks from the configured storage file when it exists.
+     *
+     * @return the tasks found in storage, or an empty list when no file exists
+     */
+    private static ArrayList<Task> loadTasks() {
+        ArrayList<Task> tasks = new ArrayList<>();
+        if (!Files.exists(TASK_FILE)) {
+            return tasks;
+        }
+
+        try {
+            for (String line : Files.readAllLines(TASK_FILE)) {
+                addTaskFromStorageLine(tasks, line);
+            }
+        } catch (IOException exception) {
+            return new ArrayList<>();
+        }
+        return tasks;
+    }
+
+    /**
+     * Adds one valid persisted task line to the task list.
+     *
+     * @param tasks the task list being restored
+     * @param line the persisted task line
+     */
+    private static void addTaskFromStorageLine(ArrayList<Task> tasks, String line) {
+        String[] parts = line.split("\\s*\\|\\s*", -1);
+        if (parts.length < 3) {
+            return;
+        }
+
+        String type = parts[0];
+        String description = parts[2];
+        Task task;
+        if ("T".equals(type)) {
+            task = new Todo(description);
+        } else if ("D".equals(type) && parts.length >= 4) {
+            task = new Deadline(description, parts[3]);
+        } else if ("E".equals(type) && parts.length >= 5) {
+            task = new Event(description, parts[3], parts[4]);
+        } else if ("B".equals(type)) {
+            task = new Task(description);
+        } else {
+            return;
+        }
+
+        if ("1".equals(parts[1])) {
+            task.markAsDone();
+        }
+        tasks.add(task);
     }
 
     /**
