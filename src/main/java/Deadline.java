@@ -21,6 +21,16 @@ public class Deadline extends Task {
     }
 
     /**
+     * Returns this deadline in the format used for persistent storage.
+     *
+     * @return the deadline type, completion state, description, and deadline separated by pipes
+     */
+    @Override
+    public String toStorageString() {
+        return super.toStorageString() + " | " + by;
+    }
+
+    /**
      * Returns this deadline task with its type prefix and deadline.
      *
      * @return the deadline display string

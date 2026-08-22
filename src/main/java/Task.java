@@ -80,6 +80,16 @@ public class Task {
     }
 
     /**
+     * Returns this task in the format used for persistent storage.
+     *
+     * @return the task type, completion state, and description separated by pipes
+     */
+    public String toStorageString() {
+        return taskType.name().charAt(0) + " | "
+                + (status == TaskStatus.DONE ? "1" : "0") + " | " + description;
+    }
+
+    /**
      * Returns this task in its display format.
      *
      * @return the status marker followed by the description
