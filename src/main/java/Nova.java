@@ -1,5 +1,4 @@
 import java.time.LocalDate;
-import java.util.ArrayList;
 
 /**
  * Starts the Nova chatbot application.
@@ -33,46 +32,39 @@ public class Nova {
                 }
                 case ON -> {
                 LocalDate date = parsedCommand.date();
-                ArrayList<Task> matchingTasks = new ArrayList<>();
-                for (Task task : tasks) {
-                    if (occursOn(task, date)) {
-                        matchingTasks.add(task);
-                    }
-                }
-                ui.showTasksOn(date, matchingTasks);
+                ui.showTasksOn(date, tasks.getTasksOn(date));
                 }
                 case MARK -> {
                 int taskNumber = parsedCommand.taskNumber();
-                int taskIndex = getTaskIndex(taskNumber, tasks.size());
-                tasks.get(taskIndex).markAsDone();
+                Task task = tasks.getByNumber(taskNumber);
+                tasks.markAsDone(taskNumber);
                 try {
                     storage.save(tasks);
                 } catch (NovaException exception) {
-                    tasks.get(taskIndex).markAsNotDone();
+                    tasks.markAsNotDone(taskNumber);
                     throw exception;
                 }
-                ui.showMarkedDone(tasks.get(taskIndex));
+                ui.showMarkedDone(task);
                 }
                 case UNMARK -> {
                 int taskNumber = parsedCommand.taskNumber();
-                int taskIndex = getTaskIndex(taskNumber, tasks.size());
-                tasks.get(taskIndex).markAsNotDone();
+                Task task = tasks.getByNumber(taskNumber);
+                tasks.markAsNotDone(taskNumber);
                 try {
                     storage.save(tasks);
                 } catch (NovaException exception) {
-                    tasks.get(taskIndex).markAsDone();
+                    tasks.markAsDone(taskNumber);
                     throw exception;
                 }
-                ui.showMarkedNotDone(tasks.get(taskIndex));
+                ui.showMarkedNotDone(task);
                 }
                 case DELETE -> {
                 int taskNumber = parsedCommand.taskNumber();
-                int taskIndex = getTaskIndex(taskNumber, tasks.size());
-                Task deletedTask = tasks.remove(taskIndex);
+                Task deletedTask = tasks.removeByNumber(taskNumber);
                 try {
                     storage.save(tasks);
                 } catch (NovaException exception) {
-                    tasks.add(taskIndex, deletedTask);
+                    tasks.add(taskNumber - 1, deletedTask);
                     throw exception;
                 }
                 ui.showDeleted(deletedTask, tasks.size());
@@ -115,33 +107,6 @@ public class Nova {
             tasks.remove(tasks.size() - 1);
             throw exception;
         }
-    }
-
-    /** Returns whether a deadline or event occurs on the requested date. */
-    private static boolean occursOn(Task task, LocalDate date) {
-        if (task instanceof Deadline deadline) {
-            return deadline.by.equals(date);
-        }
-        if (task instanceof Event event) {
-            String dateText = date.toString();
-            return event.from.contains(dateText) || event.to.contains(dateText);
-        }
-        return false;
-    }
-
-    /**
-     * Converts a one-based task number into an ArrayList index after validating it.
-     *
-     * @param taskNumber the number entered by the user
-     * @param taskCount the number of tasks currently stored
-     * @return the zero-based array index
-     * @throws NovaException if the number does not identify an existing task
-     */
-    private static int getTaskIndex(int taskNumber, int taskCount) throws NovaException {
-        if (taskNumber < 1 || taskNumber > taskCount) {
-            throw new NovaException("Please provide a valid task number.");
-        }
-        return taskNumber - 1;
     }
 
 }

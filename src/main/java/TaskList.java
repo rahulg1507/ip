@@ -1,5 +1,6 @@
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.time.LocalDate;
 
 /** Owns the tasks currently managed by Nova. */
 public class TaskList implements Iterable<Task> {
@@ -29,6 +30,44 @@ public class TaskList implements Iterable<Task> {
     /** Returns the number of tasks. */
     public int size() {
         return tasks.size();
+    }
+
+    /** Returns the task at a one-based user-facing position. */
+    public Task getByNumber(int taskNumber) throws NovaException {
+        if (taskNumber < 1 || taskNumber > tasks.size()) {
+            throw new NovaException("Please provide a valid task number.");
+        }
+        return tasks.get(taskNumber - 1);
+    }
+
+    /** Marks the task at a one-based user-facing position as done. */
+    public void markAsDone(int taskNumber) throws NovaException {
+        getByNumber(taskNumber).markAsDone();
+    }
+
+    /** Marks the task at a one-based user-facing position as not done. */
+    public void markAsNotDone(int taskNumber) throws NovaException {
+        getByNumber(taskNumber).markAsNotDone();
+    }
+
+    /** Removes and returns the task at a one-based user-facing position. */
+    public Task removeByNumber(int taskNumber) throws NovaException {
+        getByNumber(taskNumber);
+        return tasks.remove(taskNumber - 1);
+    }
+
+    /** Returns deadlines and events that occur on the requested date. */
+    public ArrayList<Task> getTasksOn(LocalDate date) {
+        ArrayList<Task> matchingTasks = new ArrayList<>();
+        for (Task task : tasks) {
+            if (task instanceof Deadline deadline && deadline.by.equals(date)) {
+                matchingTasks.add(task);
+            } else if (task instanceof Event event
+                    && (event.from.contains(date.toString()) || event.to.contains(date.toString()))) {
+                matchingTasks.add(task);
+            }
+        }
+        return matchingTasks;
     }
 
     /** Allows callers to process every task without owning the collection. */
