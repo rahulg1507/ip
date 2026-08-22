@@ -2,6 +2,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Scanner;
 
@@ -102,7 +103,7 @@ public class Nova {
                     throw new NovaException("Please use: deadline DESCRIPTION /by DATE.");
                 }
                 String description = command.substring(9, byIndex);
-                String by = command.substring(byIndex + 5);
+                LocalDate by = LocalDate.parse(command.substring(byIndex + 5));
                 addTaskAndSave(tasks, new Deadline(description, by));
                 System.out.println(" Got it. I've added this task:");
                 System.out.println("  " + tasks.get(tasks.size() - 1));
@@ -230,7 +231,7 @@ public class Nova {
         if ("T".equals(type) && parts.length == 3) {
             task = new Todo(description);
         } else if ("D".equals(type) && parts.length == 4 && !parts[3].isBlank()) {
-            task = new Deadline(description, parts[3]);
+            task = new Deadline(description, LocalDate.parse(parts[3]));
         } else if ("E".equals(type) && parts.length == 5
                 && !parts[3].isBlank() && !parts[4].isBlank()) {
             task = new Event(description, parts[3], parts[4]);

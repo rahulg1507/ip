@@ -221,7 +221,7 @@ Expected output:
 Aim: Verify that deleting a middle task keeps the remaining task order and positions correct across todo, deadline, and event tasks.
 Inputs:
     todo read book
-    deadline submit assignment /by Friday
+    deadline submit assignment /by 2020-01-01
     event project meeting /from Monday 2pm /to 4pm
     delete 2
     mark 2
@@ -244,7 +244,7 @@ Expected output:
     ____________________________________________________________
     ____________________________________________________________
      Got it. I've added this task:
-      [D][ ] submit assignment (by: Friday)
+      [D][ ] submit assignment (by: Jan 1 2020)
      Now you have 2 tasks in the list.
     ____________________________________________________________
     ____________________________________________________________
@@ -254,7 +254,7 @@ Expected output:
     ____________________________________________________________
     ____________________________________________________________
      Noted. I've removed this task:
-       [D][ ] submit assignment (by: Friday)
+       [D][ ] submit assignment (by: Jan 1 2020)
      Now you have 2 tasks in the list.
     ____________________________________________________________
     ____________________________________________________________
@@ -307,10 +307,10 @@ Expected output:
     ____________________________________________________________
 
 ## Add and list deadline tasks
-Aim: Verify that deadline tasks preserve their plain-text deadline and display the D prefix.
+Aim: Verify that deadline tasks accept yyyy-mm-dd dates, display them as MMM d yyyy, and use the D prefix.
 Inputs:
-    deadline return book /by Sunday
-    deadline submit assignment /by 11:59 pm
+    deadline return book /by 2019-10-15
+    deadline submit assignment /by 2020-01-01
     list
     bye
 Expected output:
@@ -325,18 +325,18 @@ Expected output:
     ____________________________________________________________
     ____________________________________________________________
      Got it. I've added this task:
-      [D][ ] return book (by: Sunday)
+      [D][ ] return book (by: Oct 15 2019)
      Now you have 1 tasks in the list.
     ____________________________________________________________
     ____________________________________________________________
      Got it. I've added this task:
-      [D][ ] submit assignment (by: 11:59 pm)
+      [D][ ] submit assignment (by: Jan 1 2020)
      Now you have 2 tasks in the list.
     ____________________________________________________________
     ____________________________________________________________
      Here are the tasks in your list:
-     1.[D][ ] return book (by: Sunday)
-     2.[D][ ] submit assignment (by: 11:59 pm)
+     1.[D][ ] return book (by: Oct 15 2019)
+     2.[D][ ] submit assignment (by: Jan 1 2020)
     ____________________________________________________________
     ____________________________________________________________
     Bye. Hope to see you again soon!
@@ -382,7 +382,7 @@ Expected output:
 Aim: Verify that adding, completing, uncompleting, and deleting tasks follow the normal task-change flow that saves the task list.
 Inputs:
     todo read book
-    deadline return book /by Sunday
+    deadline return book /by 2019-10-15
     mark 1
     unmark 1
     delete 2
@@ -404,7 +404,7 @@ Expected output:
     ____________________________________________________________
     ____________________________________________________________
      Got it. I've added this task:
-      [D][ ] return book (by: Sunday)
+      [D][ ] return book (by: Oct 15 2019)
      Now you have 2 tasks in the list.
     ____________________________________________________________
     ____________________________________________________________
@@ -417,9 +417,10 @@ Expected output:
     ____________________________________________________________
     ____________________________________________________________
      Noted. I've removed this task:
-       [D][ ] return book (by: Sunday)
+       [D][ ] return book (by: Oct 15 2019)
      Now you have 1 tasks in the list.
     ____________________________________________________________
     ____________________________________________________________
     Bye. Hope to see you again soon!
     ____________________________________________________________
+
