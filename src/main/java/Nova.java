@@ -190,14 +190,24 @@ public class Nova {
             return tasks;
         }
 
+        int corruptedLineCount = 0;
         try {
             for (String line : Files.readAllLines(TASK_FILE)) {
                 if (!line.isBlank()) {
-                    addTaskFromStorageLine(tasks, line);
+                    boolean isTaskLoaded = addTaskFromStorageLine(tasks, line);
+                    if (!isTaskLoaded) {
+                        corruptedLineCount++;
+                    }
                 }
             }
         } catch (IOException exception) {
+            System.out.println(" Warning: Unable to read saved tasks. Starting with an empty list.");
             return new ArrayList<>();
+        }
+
+        if (corruptedLineCount > 0) {
+            System.out.println(" Warning: Ignored " + corruptedLineCount
+                    + " corrupted task record(s).");
         }
         return tasks;
     }
@@ -208,10 +218,10 @@ public class Nova {
      * @param tasks the task list being restored
      * @param line the persisted task line
      */
-    private static void addTaskFromStorageLine(ArrayList<Task> tasks, String line) {
+    private static boolean addTaskFromStorageLine(ArrayList<Task> tasks, String line) {
         String[] parts = line.split("\\s*\\|\\s*", -1);
         if (parts.length < 3 || !isValidStatus(parts[1]) || parts[2].isBlank()) {
-            return;
+            return false;
         }
 
         String type = parts[0];
@@ -227,13 +237,14 @@ public class Nova {
         } else if ("B".equals(type) && parts.length == 3) {
             task = new Task(description);
         } else {
-            return;
+            return false;
         }
 
         if ("1".equals(parts[1])) {
             task.markAsDone();
         }
         tasks.add(task);
+        return true;
     }
 
     /**
