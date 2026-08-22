@@ -2,6 +2,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Scanner;
 
@@ -48,6 +50,14 @@ public class Nova {
                 System.out.println(" Here are the tasks in your list:");
                 for (int i = 0; i < tasks.size(); i++) {
                     System.out.println(" " + (i + 1) + "." + tasks.get(i));
+                }
+                } else if (command.startsWith("on ")) {
+                LocalDate date = parseDate(command.substring(3).trim());
+                System.out.println(" Tasks on " + date + ":");
+                for (Task task : tasks) {
+                    if (occursOn(task, date)) {
+                        System.out.println(" " + task);
+                    }
                 }
                 } else if (command.trim().equals("mark") || command.startsWith("mark ")) {
                 int taskNumber = getTaskNumber(command, "mark");
@@ -102,7 +112,12 @@ public class Nova {
                     throw new NovaException("Please use: deadline DESCRIPTION /by DATE.");
                 }
                 String description = command.substring(9, byIndex);
-                String by = command.substring(byIndex + 5);
+                LocalDate by;
+                try {
+                    by = parseDate(command.substring(byIndex + 5));
+                } catch (DateTimeParseException exception) {
+                    throw new NovaException("Please use a valid date in yyyy-MM-dd format.");
+                }
                 addTaskAndSave(tasks, new Deadline(description, by));
                 System.out.println(" Got it. I've added this task:");
                 System.out.println("  " + tasks.get(tasks.size() - 1));
@@ -230,7 +245,11 @@ public class Nova {
         if ("T".equals(type) && parts.length == 3) {
             task = new Todo(description);
         } else if ("D".equals(type) && parts.length == 4 && !parts[3].isBlank()) {
-            task = new Deadline(description, parts[3]);
+            try {
+                task = new Deadline(description, LocalDate.parse(parts[3]));
+            } catch (DateTimeParseException exception) {
+                return false;
+            }
         } else if ("E".equals(type) && parts.length == 5
                 && !parts[3].isBlank() && !parts[4].isBlank()) {
             task = new Event(description, parts[3], parts[4]);
@@ -255,6 +274,27 @@ public class Nova {
      */
     private static boolean isValidStatus(String status) {
         return "0".equals(status) || "1".equals(status);
+    }
+
+    /** Parses a user-supplied ISO date and converts failures to chatbot errors. */
+    private static LocalDate parseDate(String value) throws NovaException {
+        try {
+            return LocalDate.parse(value);
+        } catch (DateTimeParseException exception) {
+            throw new NovaException("Please use a valid date in yyyy-MM-dd format.");
+        }
+    }
+
+    /** Returns whether a deadline or event occurs on the requested date. */
+    private static boolean occursOn(Task task, LocalDate date) {
+        if (task instanceof Deadline deadline) {
+            return deadline.by.equals(date);
+        }
+        if (task instanceof Event event) {
+            String dateText = date.toString();
+            return event.from.contains(dateText) || event.to.contains(dateText);
+        }
+        return false;
     }
 
     /**

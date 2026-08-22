@@ -1,15 +1,21 @@
-/** Represents a task that must be completed by a plain-text deadline. */
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+
+/** Represents a task that must be completed by a calendar date. */
 public class Deadline extends Task {
-    /** The plain-text deadline. */
-    protected String by;
+    /** The deadline date. */
+    protected LocalDate by;
+
+    /** The format used when showing dates to the user. */
+    private static final DateTimeFormatter DISPLAY_FORMAT = DateTimeFormatter.ofPattern("MMM d yyyy");
 
     /**
      * Creates an incomplete deadline task.
      *
      * @param description the text describing the task
-     * @param by the plain-text deadline
+     * @param by the deadline date
      */
-    public Deadline(String description, String by) {
+    public Deadline(String description, LocalDate by) {
         super(description, TaskType.DEADLINE);
         this.by = by;
     }
@@ -17,7 +23,7 @@ public class Deadline extends Task {
     /** @return the task description with its deadline suffix */
     @Override
     public String getDisplayDescription() {
-        return description + " (by: " + by + ")";
+        return description + " (by: " + by.format(DISPLAY_FORMAT) + ")";
     }
 
     /**
@@ -37,6 +43,6 @@ public class Deadline extends Task {
      */
     @Override
     public String toString() {
-        return super.toString() + " (by: " + by + ")";
+        return super.toString() + " (by: " + by.format(DISPLAY_FORMAT) + ")";
     }
 }
