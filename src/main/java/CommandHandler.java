@@ -15,8 +15,9 @@ public class CommandHandler {
     public boolean execute(Parser.ParsedCommand command) throws NovaException {
         switch (command.type()) {
         case EXIT -> {
-            ui.showFarewell();
-            return true;
+            Command exitCommand = new ExitCommand();
+            exitCommand.execute(tasks, ui, storage);
+            return exitCommand.isExit();
         }
         case LIST -> ui.showTaskList(tasks);
         case ON -> ui.showTasksOn(command.date(), tasks.getTasksOn(command.date()));
