@@ -1,3 +1,5 @@
+package nova.task;
+
 /**
  * Represents a basic task with a description and completion status.
  * Specialized task types extend this class and customize their display.

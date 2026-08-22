@@ -1,3 +1,5 @@
+package nova.task;
+
 /** Represents an event with plain-text start and end date/time values. */
 public class Event extends Task {
     /** The plain-text event start date and time. */
