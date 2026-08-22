@@ -377,3 +377,49 @@ Expected output:
     ____________________________________________________________
     Bye. Hope to see you again soon!
     ____________________________________________________________
+
+## Save tasks after changes
+Aim: Verify that adding, completing, uncompleting, and deleting tasks follow the normal task-change flow that saves the task list.
+Inputs:
+    todo read book
+    deadline return book /by Sunday
+    mark 1
+    unmark 1
+    delete 2
+    bye
+Expected output:
+    ____________________________________________________________
+     _   _    ___    _   _    _
+    | \ | |  / _ \  | | | |  / \
+    |  \| | | | | | | | | | / _ \
+    | |\  | | |_| |  \ V / / ___ \
+    |_| \_|  \___/    \_/ /_/   \_\
+    Hello! I'm Nova.
+    What can I do for you?
+    ____________________________________________________________
+    ____________________________________________________________
+     Got it. I've added this task:
+      [T][ ] read book
+     Now you have 1 tasks in the list.
+    ____________________________________________________________
+    ____________________________________________________________
+     Got it. I've added this task:
+      [D][ ] return book (by: Sunday)
+     Now you have 2 tasks in the list.
+    ____________________________________________________________
+    ____________________________________________________________
+     Nice! I've marked this task as done:
+       [T][X] read book
+    ____________________________________________________________
+    ____________________________________________________________
+     OK, I've marked this task as not done yet:
+       [T][ ] read book
+    ____________________________________________________________
+    ____________________________________________________________
+     Noted. I've removed this task:
+       [D][ ] return book (by: Sunday)
+     Now you have 1 tasks in the list.
+    ____________________________________________________________
+    ____________________________________________________________
+    Bye. Hope to see you again soon!
+    ____________________________________________________________

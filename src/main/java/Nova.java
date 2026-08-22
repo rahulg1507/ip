@@ -1,3 +1,6 @@
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Scanner;
 
@@ -5,6 +8,14 @@ import java.util.Scanner;
  * Starts the Nova chatbot application.
  */
 public class Nova {
+    /** The file used to store the current task list. */
+    private static final Path TASK_FILE = Path.of("data", "nova.txt");
+
+    /**
+     * Starts the Nova chatbot and processes commands until the input ends.
+     *
+     * @param args command-line arguments, which are not used
+     */
     public static void main(String[] args) {
         String divider = "____________________________________________________________";
         String banner = " _   _    ___    _   _    _\n"
@@ -41,18 +52,21 @@ public class Nova {
                 int taskNumber = getTaskNumber(command, "mark");
                 int taskIndex = getTaskIndex(taskNumber, tasks.size());
                 tasks.get(taskIndex).markAsDone();
+                saveTasks(tasks);
                 System.out.println(" Nice! I've marked this task as done:");
                 System.out.println("   " + tasks.get(taskIndex));
                 } else if (command.trim().equals("unmark") || command.startsWith("unmark ")) {
                 int taskNumber = getTaskNumber(command, "unmark");
                 int taskIndex = getTaskIndex(taskNumber, tasks.size());
                 tasks.get(taskIndex).markAsNotDone();
+                saveTasks(tasks);
                 System.out.println(" OK, I've marked this task as not done yet:");
                 System.out.println("   " + tasks.get(taskIndex));
                 } else if (command.trim().equals("delete") || command.startsWith("delete ")) {
                 int taskNumber = getTaskNumber(command, "delete");
                 int taskIndex = getTaskIndex(taskNumber, tasks.size());
                 Task deletedTask = tasks.remove(taskIndex);
+                saveTasks(tasks);
                 System.out.println(" Noted. I've removed this task:");
                 System.out.println("   " + deletedTask);
                 System.out.println(" Now you have " + tasks.size() + " tasks in the list.");
@@ -62,6 +76,7 @@ public class Nova {
                         throw new NovaException("Please add a description after 'todo'.");
                 } else {
                     tasks.add(new Todo(description));
+                    saveTasks(tasks);
                     System.out.println(" Got it. I've added this task:");
                     System.out.println("  " + tasks.get(tasks.size() - 1));
                     System.out.println(" Now you have " + tasks.size() + " tasks in the list.");
@@ -74,6 +89,7 @@ public class Nova {
                 String description = command.substring(9, byIndex);
                 String by = command.substring(byIndex + 5);
                 tasks.add(new Deadline(description, by));
+                saveTasks(tasks);
                 System.out.println(" Got it. I've added this task:");
                 System.out.println("  " + tasks.get(tasks.size() - 1));
                 System.out.println(" Now you have " + tasks.size() + " tasks in the list.");
@@ -87,6 +103,7 @@ public class Nova {
                 String from = command.substring(fromIndex + 7, toIndex);
                 String to = command.substring(toIndex + 5);
                 tasks.add(new Event(description, from, to));
+                saveTasks(tasks);
                 System.out.println(" Got it. I've added this task:");
                 System.out.println("  " + tasks.get(tasks.size() - 1));
                 System.out.println(" Now you have " + tasks.size() + " tasks in the list.");
@@ -98,6 +115,25 @@ public class Nova {
             }
 
             System.out.println(divider);
+        }
+    }
+
+    /**
+     * Saves the current task list to the configured storage file.
+     *
+     * @param tasks the task list to save
+     * @throws NovaException if the storage file cannot be written
+     */
+    private static void saveTasks(ArrayList<Task> tasks) throws NovaException {
+        try {
+            Files.createDirectories(TASK_FILE.getParent());
+            ArrayList<String> lines = new ArrayList<>();
+            for (Task task : tasks) {
+                lines.add(task.toStorageString());
+            }
+            Files.write(TASK_FILE, lines);
+        } catch (IOException exception) {
+            throw new NovaException("Unable to save tasks.");
         }
     }
 

@@ -26,6 +26,16 @@ public class Event extends Task {
     }
 
     /**
+     * Returns this event in the format used for persistent storage.
+     *
+     * @return the event type, completion state, description, start, and end separated by pipes
+     */
+    @Override
+    public String toStorageString() {
+        return super.toStorageString() + " | " + from + " | " + to;
+    }
+
+    /**
      * Returns this event task with its type prefix and time range.
      *
      * @return the event display string
