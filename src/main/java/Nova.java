@@ -1,5 +1,5 @@
 import java.time.LocalDate;
-import java.util.Scanner;
+import java.util.ArrayList;
 
 /**
  * Starts the Nova chatbot application.
@@ -11,50 +11,35 @@ public class Nova {
      * @param args command-line arguments, which are not used
      */
     public static void main(String[] args) {
-        String divider = "____________________________________________________________";
-        String banner = " _   _    ___    _   _    _\n"
-                + "| \\ | |  / _ \\  | | | |  / \\\n"
-                + "|  \\| | | | | | | | | | / _ \\\n"
-                + "| |\\  | | |_| |  \\ V / / ___ \\\n"
-                + "|_| \\_|  \\___/    \\_/ /_/   \\_\\\n";
-
-        System.out.println(divider);
-        System.out.print(banner);
-        System.out.println("Hello! I'm Nova.");
-        System.out.println("What can I do for you?");
-        System.out.println(divider);
-
+        Ui ui = new Ui();
+        ui.showGreeting();
         Storage storage = new Storage();
         TaskList tasks = storage.load();
         Parser parser = new Parser();
-        Scanner scanner = new Scanner(System.in);
-        while (scanner.hasNextLine()) {
-            String command = scanner.nextLine();
-            System.out.println(divider);
+        while (ui.hasNextCommand()) {
+            String command = ui.readCommand();
+            ui.showDivider();
 
             try {
                 Parser.ParsedCommand parsedCommand = parser.parse(command);
                 if (parsedCommand.type() == Parser.CommandType.EXIT) {
-                System.out.println("Bye. Hope to see you again soon!");
-                System.out.println(divider);
+                ui.showFarewell();
                 break;
                 }
 
                 switch (parsedCommand.type()) {
                 case LIST -> {
-                System.out.println(" Here are the tasks in your list:");
-                for (int i = 0; i < tasks.size(); i++) {
-                    System.out.println(" " + (i + 1) + "." + tasks.get(i));
-                }
+                ui.showTaskList(tasks);
                 }
                 case ON -> {
                 LocalDate date = parsedCommand.date();
-                System.out.println(" Tasks on " + date + ":");
+                ArrayList<Task> matchingTasks = new ArrayList<>();
                 for (Task task : tasks) {
                     if (occursOn(task, date)) {
-                        System.out.println(" " + task);
+                        matchingTasks.add(task);
                     }
                 }
+                ui.showTasksOn(date, matchingTasks);
                 }
                 case MARK -> {
                 int taskNumber = parsedCommand.taskNumber();
@@ -66,8 +51,7 @@ public class Nova {
                     tasks.get(taskIndex).markAsNotDone();
                     throw exception;
                 }
-                System.out.println(" Nice! I've marked this task as done:");
-                System.out.println("   " + tasks.get(taskIndex));
+                ui.showMarkedDone(tasks.get(taskIndex));
                 }
                 case UNMARK -> {
                 int taskNumber = parsedCommand.taskNumber();
@@ -79,8 +63,7 @@ public class Nova {
                     tasks.get(taskIndex).markAsDone();
                     throw exception;
                 }
-                System.out.println(" OK, I've marked this task as not done yet:");
-                System.out.println("   " + tasks.get(taskIndex));
+                ui.showMarkedNotDone(tasks.get(taskIndex));
                 }
                 case DELETE -> {
                 int taskNumber = parsedCommand.taskNumber();
@@ -92,36 +75,28 @@ public class Nova {
                     tasks.add(taskIndex, deletedTask);
                     throw exception;
                 }
-                System.out.println(" Noted. I've removed this task:");
-                System.out.println("   " + deletedTask);
-                System.out.println(" Now you have " + tasks.size() + " tasks in the list.");
+                ui.showDeleted(deletedTask, tasks.size());
                 }
                 case TODO -> {
                 addTaskAndSave(storage, tasks, new Todo(parsedCommand.description()));
-                System.out.println(" Got it. I've added this task:");
-                System.out.println("  " + tasks.get(tasks.size() - 1));
-                System.out.println(" Now you have " + tasks.size() + " tasks in the list.");
+                ui.showAdded(tasks.get(tasks.size() - 1), tasks.size());
                 }
                 case DEADLINE -> {
                 addTaskAndSave(storage, tasks, new Deadline(parsedCommand.description(), parsedCommand.date()));
-                System.out.println(" Got it. I've added this task:");
-                System.out.println("  " + tasks.get(tasks.size() - 1));
-                System.out.println(" Now you have " + tasks.size() + " tasks in the list.");
+                ui.showAdded(tasks.get(tasks.size() - 1), tasks.size());
                 }
                 case EVENT -> {
                 addTaskAndSave(storage, tasks, new Event(parsedCommand.description(),
                         parsedCommand.from(), parsedCommand.to()));
-                System.out.println(" Got it. I've added this task:");
-                System.out.println("  " + tasks.get(tasks.size() - 1));
-                System.out.println(" Now you have " + tasks.size() + " tasks in the list.");
+                ui.showAdded(tasks.get(tasks.size() - 1), tasks.size());
                 }
                 case EXIT -> { }
                 }
             } catch (NovaException exception) {
-                System.out.println(" " + exception.getMessage());
+                ui.showError(exception);
             }
 
-            System.out.println(divider);
+            ui.showDivider();
         }
     }
 
