@@ -1,6 +1,7 @@
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Scanner;
 
@@ -52,21 +53,36 @@ public class Nova {
                 int taskNumber = getTaskNumber(command, "mark");
                 int taskIndex = getTaskIndex(taskNumber, tasks.size());
                 tasks.get(taskIndex).markAsDone();
-                saveTasks(tasks);
+                try {
+                    saveTasks(tasks);
+                } catch (NovaException exception) {
+                    tasks.get(taskIndex).markAsNotDone();
+                    throw exception;
+                }
                 System.out.println(" Nice! I've marked this task as done:");
                 System.out.println("   " + tasks.get(taskIndex));
                 } else if (command.trim().equals("unmark") || command.startsWith("unmark ")) {
                 int taskNumber = getTaskNumber(command, "unmark");
                 int taskIndex = getTaskIndex(taskNumber, tasks.size());
                 tasks.get(taskIndex).markAsNotDone();
-                saveTasks(tasks);
+                try {
+                    saveTasks(tasks);
+                } catch (NovaException exception) {
+                    tasks.get(taskIndex).markAsDone();
+                    throw exception;
+                }
                 System.out.println(" OK, I've marked this task as not done yet:");
                 System.out.println("   " + tasks.get(taskIndex));
                 } else if (command.trim().equals("delete") || command.startsWith("delete ")) {
                 int taskNumber = getTaskNumber(command, "delete");
                 int taskIndex = getTaskIndex(taskNumber, tasks.size());
                 Task deletedTask = tasks.remove(taskIndex);
-                saveTasks(tasks);
+                try {
+                    saveTasks(tasks);
+                } catch (NovaException exception) {
+                    tasks.add(taskIndex, deletedTask);
+                    throw exception;
+                }
                 System.out.println(" Noted. I've removed this task:");
                 System.out.println("   " + deletedTask);
                 System.out.println(" Now you have " + tasks.size() + " tasks in the list.");
@@ -75,8 +91,7 @@ public class Nova {
                 if (description.isEmpty()) {
                         throw new NovaException("Please add a description after 'todo'.");
                 } else {
-                    tasks.add(new Todo(description));
-                    saveTasks(tasks);
+                    addTaskAndSave(tasks, new Todo(description));
                     System.out.println(" Got it. I've added this task:");
                     System.out.println("  " + tasks.get(tasks.size() - 1));
                     System.out.println(" Now you have " + tasks.size() + " tasks in the list.");
@@ -88,8 +103,7 @@ public class Nova {
                 }
                 String description = command.substring(9, byIndex);
                 String by = command.substring(byIndex + 5);
-                tasks.add(new Deadline(description, by));
-                saveTasks(tasks);
+                addTaskAndSave(tasks, new Deadline(description, by));
                 System.out.println(" Got it. I've added this task:");
                 System.out.println("  " + tasks.get(tasks.size() - 1));
                 System.out.println(" Now you have " + tasks.size() + " tasks in the list.");
@@ -102,8 +116,7 @@ public class Nova {
                 String description = command.substring(6, fromIndex);
                 String from = command.substring(fromIndex + 7, toIndex);
                 String to = command.substring(toIndex + 5);
-                tasks.add(new Event(description, from, to));
-                saveTasks(tasks);
+                addTaskAndSave(tasks, new Event(description, from, to));
                 System.out.println(" Got it. I've added this task:");
                 System.out.println("  " + tasks.get(tasks.size() - 1));
                 System.out.println(" Now you have " + tasks.size() + " tasks in the list.");
@@ -125,15 +138,44 @@ public class Nova {
      * @throws NovaException if the storage file cannot be written
      */
     private static void saveTasks(ArrayList<Task> tasks) throws NovaException {
+        Path temporaryFile = TASK_FILE.resolveSibling(TASK_FILE.getFileName() + ".tmp");
         try {
             Files.createDirectories(TASK_FILE.getParent());
             ArrayList<String> lines = new ArrayList<>();
             for (Task task : tasks) {
                 lines.add(task.toStorageString());
             }
-            Files.write(TASK_FILE, lines);
+            Files.write(temporaryFile, lines);
+            try {
+                Files.move(temporaryFile, TASK_FILE, StandardCopyOption.ATOMIC_MOVE,
+                        StandardCopyOption.REPLACE_EXISTING);
+            } catch (IOException exception) {
+                Files.move(temporaryFile, TASK_FILE, StandardCopyOption.REPLACE_EXISTING);
+            }
         } catch (IOException exception) {
+            try {
+                Files.deleteIfExists(temporaryFile);
+            } catch (IOException ignoredException) {
+                // Preserve the original save failure for the user.
+            }
             throw new NovaException("Unable to save tasks.");
+        }
+    }
+
+    /**
+     * Adds a task and rolls back the addition if persistence fails.
+     *
+     * @param tasks the task list to update
+     * @param task the task to add
+     * @throws NovaException if the updated list cannot be saved
+     */
+    private static void addTaskAndSave(ArrayList<Task> tasks, Task task) throws NovaException {
+        tasks.add(task);
+        try {
+            saveTasks(tasks);
+        } catch (NovaException exception) {
+            tasks.remove(tasks.size() - 1);
+            throw exception;
         }
     }
 
@@ -150,7 +192,9 @@ public class Nova {
 
         try {
             for (String line : Files.readAllLines(TASK_FILE)) {
-                addTaskFromStorageLine(tasks, line);
+                if (!line.isBlank()) {
+                    addTaskFromStorageLine(tasks, line);
+                }
             }
         } catch (IOException exception) {
             return new ArrayList<>();
@@ -166,20 +210,21 @@ public class Nova {
      */
     private static void addTaskFromStorageLine(ArrayList<Task> tasks, String line) {
         String[] parts = line.split("\\s*\\|\\s*", -1);
-        if (parts.length < 3) {
+        if (parts.length < 3 || !isValidStatus(parts[1]) || parts[2].isBlank()) {
             return;
         }
 
         String type = parts[0];
         String description = parts[2];
         Task task;
-        if ("T".equals(type)) {
+        if ("T".equals(type) && parts.length == 3) {
             task = new Todo(description);
-        } else if ("D".equals(type) && parts.length >= 4) {
+        } else if ("D".equals(type) && parts.length == 4 && !parts[3].isBlank()) {
             task = new Deadline(description, parts[3]);
-        } else if ("E".equals(type) && parts.length >= 5) {
+        } else if ("E".equals(type) && parts.length == 5
+                && !parts[3].isBlank() && !parts[4].isBlank()) {
             task = new Event(description, parts[3], parts[4]);
-        } else if ("B".equals(type)) {
+        } else if ("B".equals(type) && parts.length == 3) {
             task = new Task(description);
         } else {
             return;
@@ -189,6 +234,16 @@ public class Nova {
             task.markAsDone();
         }
         tasks.add(task);
+    }
+
+    /**
+     * Returns whether a persisted completion value is supported.
+     *
+     * @param status the persisted completion value
+     * @return true if the value represents an incomplete or completed task
+     */
+    private static boolean isValidStatus(String status) {
+        return "0".equals(status) || "1".equals(status);
     }
 
     /**
