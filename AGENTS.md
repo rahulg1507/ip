@@ -34,6 +34,8 @@ Use lightweight tags unless the user requests an annotated tag.
 When proposing or creating a commit message, include enough detail to explain the rationale for the change.
 Do not commit or push unless explicitly asked.
 
+Before every commit or branch creation, use the project-local `$seedu-git-standard` skill. Its rules are mandatory for commit subjects, commit bodies, and branch names: use imperative, capitalized, punctuation-free subjects; concise subject lengths; informative 72-column bodies explaining what and why; and meaningful kebab-case branch names while preserving any higher-priority repository prefix.
+
 ## UI testing after code changes
 
 After every code update:
