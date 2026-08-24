@@ -3,6 +3,7 @@ package nova.task;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.Locale;
 import nova.exception.NovaException;
 
 /** Owns the tasks currently managed by Nova. */
@@ -67,6 +68,18 @@ public class TaskList implements Iterable<Task> {
                 matchingTasks.add(task);
             } else if (task instanceof Event event
                     && (event.from.contains(date.toString()) || event.to.contains(date.toString()))) {
+                matchingTasks.add(task);
+            }
+        }
+        return matchingTasks;
+    }
+
+    /** Returns tasks whose descriptions contain the keyword, ignoring letter case. */
+    public ArrayList<Task> find(String keyword) {
+        String normalizedKeyword = keyword.toLowerCase(Locale.ROOT);
+        ArrayList<Task> matchingTasks = new ArrayList<>();
+        for (Task task : tasks) {
+            if (task.getDescription().toLowerCase(Locale.ROOT).contains(normalizedKeyword)) {
                 matchingTasks.add(task);
             }
         }

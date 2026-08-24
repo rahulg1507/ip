@@ -1,5 +1,6 @@
 package nova.command;
 
+import java.util.ArrayList;
 import nova.exception.NovaException;
 import nova.parser.Parser;
 import nova.storage.Storage;
@@ -32,6 +33,10 @@ public class CommandHandler {
             return exitCommand.isExit();
         }
         case LIST -> ui.showTaskList(tasks);
+        case FIND -> {
+            ArrayList<Task> matchingTasks = tasks.find(command.description());
+            ui.showMatchingTasks(matchingTasks);
+        }
         case ON -> ui.showTasksOn(command.date(), tasks.getTasksOn(command.date()));
         case MARK -> {
             int taskNumber = command.taskNumber();

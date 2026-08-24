@@ -24,6 +24,17 @@ class ParserTest {
         );
     }
 
+    /** Verifies that find commands extract a trimmed keyword. */
+    @Test
+    void parse_findCommand_extractsKeyword() throws NovaException {
+        Parser.ParsedCommand result = parser.parse("find   book  ");
+
+        assertAll(
+                () -> assertEquals(Parser.CommandType.FIND, result.type()),
+                () -> assertEquals("book", result.description())
+        );
+    }
+
     /** Verifies that task commands preserve their command type and number. */
     @Test
     void parse_taskNumberCommands_extractsCommandAndNumber() throws NovaException {
@@ -150,6 +161,15 @@ class ParserTest {
                 () -> parser.parse("todo"));
 
         assertEquals("Please add a description after 'todo'.", exception.getMessage());
+    }
+
+    /** Verifies that an empty find keyword produces a clear error. */
+    @Test
+    void parse_missingFindKeyword_throwsClearError() {
+        NovaException exception = assertThrows(NovaException.class,
+                () -> parser.parse("find"));
+
+        assertEquals("Please add a keyword after 'find'.", exception.getMessage());
     }
 
     /** Verifies that an impossible deadline date produces a clear error. */

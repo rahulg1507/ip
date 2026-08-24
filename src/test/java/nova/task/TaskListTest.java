@@ -103,4 +103,28 @@ class TaskListTest {
         assertEquals("event", matchingTasks.get(1).getDescription());
         assertTrue(matchingTasks.stream().noneMatch(task -> task instanceof Todo));
     }
+
+    /** Verifies that find matches description substrings without case sensitivity. */
+    @Test
+    void find_keywordMatchesDescriptionsCaseInsensitively() {
+        TaskList tasks = new TaskList();
+        tasks.add(new Todo("Read a book"));
+        tasks.add(new Deadline("Return BOOK", LocalDate.of(2026, 8, 24)));
+        tasks.add(new Event("Attend meeting", "Monday 9am", "Monday 10am"));
+
+        ArrayList<Task> matchingTasks = tasks.find("book");
+
+        assertEquals(2, matchingTasks.size());
+        assertEquals("Read a book", matchingTasks.get(0).getDescription());
+        assertEquals("Return BOOK", matchingTasks.get(1).getDescription());
+    }
+
+    /** Verifies that find returns an empty result when no description matches. */
+    @Test
+    void find_unknownKeyword_returnsNoMatches() {
+        TaskList tasks = new TaskList();
+        tasks.add(new Todo("Read a book"));
+
+        assertTrue(tasks.find("calendar").isEmpty());
+    }
 }
