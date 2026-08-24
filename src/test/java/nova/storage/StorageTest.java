@@ -18,6 +18,7 @@ class StorageTest {
     @TempDir
     Path temporaryDirectory;
 
+    /** Verifies that saving and loading preserves tasks and completion status. */
     @Test
     void saveAndLoad_roundTripPreservesTasksAndCompletionStatus() throws Exception {
         Storage storage = new Storage(temporaryDirectory.resolve("nested/nova.txt"));
@@ -37,6 +38,7 @@ class StorageTest {
                 loadedTasks.get(2).toString());
     }
 
+    /** Verifies that saving creates missing parent directories. */
     @Test
     void save_createsMissingParentDirectories() throws Exception {
         Path taskFile = temporaryDirectory.resolve("new/data/nova.txt");
@@ -50,6 +52,7 @@ class StorageTest {
         assertEquals("T | 0 | new task", Files.readString(taskFile).trim());
     }
 
+    /** Verifies that malformed records are ignored during loading. */
     @Test
     void load_ignoresMalformedRecordsAndLoadsValidRecords() throws Exception {
         Path taskFile = temporaryDirectory.resolve("nova.txt");

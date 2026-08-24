@@ -12,6 +12,7 @@ import org.junit.jupiter.api.Test;
 class ParserTest {
     private final Parser parser = new Parser();
 
+    /** Verifies that exit and list commands are classified correctly. */
     @Test
     void parse_exitAndListCommands_returnsExpectedTypes() throws NovaException {
         Parser.ParsedCommand exit = parser.parse("bye");
@@ -23,6 +24,7 @@ class ParserTest {
         );
     }
 
+    /** Verifies that task commands preserve their command type and number. */
     @Test
     void parse_taskNumberCommands_extractsCommandAndNumber() throws NovaException {
         Parser.ParsedCommand mark = parser.parse("mark 12");
@@ -39,6 +41,7 @@ class ParserTest {
         );
     }
 
+    /** Verifies that zero and negative task numbers are parsed as integers. */
     @Test
     void parse_taskNumberCommands_acceptsZeroAndNegativeNumbers() throws NovaException {
         Parser.ParsedCommand zero = parser.parse("mark 0");
@@ -50,6 +53,7 @@ class ParserTest {
         );
     }
 
+    /** Verifies that missing task numbers produce a clear error. */
     @Test
     void parse_missingTaskNumbers_throwClearError() {
         NovaException markException = assertThrows(NovaException.class,
@@ -66,6 +70,7 @@ class ParserTest {
         );
     }
 
+    /** Verifies that todo descriptions are trimmed during parsing. */
     @Test
     void parse_todoCommand_trimsDescription() throws NovaException {
         Parser.ParsedCommand result = parser.parse("todo   buy milk  ");
@@ -76,6 +81,7 @@ class ParserTest {
         );
     }
 
+    /** Verifies that deadline descriptions and ISO dates are parsed. */
     @Test
     void parse_deadlineCommand_parsesIsoDate() throws NovaException {
         Parser.ParsedCommand result = parser.parse("deadline submit report /by 2026-08-24");
@@ -87,6 +93,7 @@ class ParserTest {
         );
     }
 
+    /** Verifies that event descriptions and time ranges are extracted. */
     @Test
     void parse_eventCommand_extractsDescriptionAndTimeRange() throws NovaException {
         Parser.ParsedCommand result = parser.parse(
@@ -100,6 +107,7 @@ class ParserTest {
         );
     }
 
+    /** Verifies that date-filter commands parse ISO dates. */
     @Test
     void parse_onCommand_parsesIsoDate() throws NovaException {
         Parser.ParsedCommand result = parser.parse("on 2026-08-24");
@@ -110,6 +118,7 @@ class ParserTest {
         );
     }
 
+    /** Verifies that malformed date-filter and deadline dates are rejected. */
     @Test
     void parse_dateCommandsWithInvalidDates_throwClearError() {
         NovaException deadlineException = assertThrows(NovaException.class,
@@ -125,6 +134,7 @@ class ParserTest {
         );
     }
 
+    /** Verifies that invalid task numbers produce a clear error. */
     @Test
     void parse_invalidTaskNumber_throwsClearError() {
         NovaException exception = assertThrows(NovaException.class,
@@ -133,6 +143,7 @@ class ParserTest {
         assertEquals("Please provide a valid task number.", exception.getMessage());
     }
 
+    /** Verifies that a missing todo description produces a clear error. */
     @Test
     void parse_missingTodoDescription_throwsClearError() {
         NovaException exception = assertThrows(NovaException.class,
@@ -141,6 +152,7 @@ class ParserTest {
         assertEquals("Please add a description after 'todo'.", exception.getMessage());
     }
 
+    /** Verifies that an impossible deadline date produces a clear error. */
     @Test
     void parse_invalidDeadlineDate_throwsClearError() {
         NovaException exception = assertThrows(NovaException.class,
@@ -149,6 +161,7 @@ class ParserTest {
         assertEquals("Please use a valid date in yyyy-MM-dd format.", exception.getMessage());
     }
 
+    /** Verifies that malformed deadline and event commands report format errors. */
     @Test
     void parse_malformedDeadlineAndEventCommands_throwFormatErrors() {
         NovaException deadlineException = assertThrows(NovaException.class,
@@ -164,6 +177,7 @@ class ParserTest {
         );
     }
 
+    /** Verifies that malformed deadline variants report format errors. */
     @Test
     void parse_malformedDeadlineVariants_throwFormatError() {
         NovaException missingDate = assertThrows(NovaException.class,
@@ -179,6 +193,7 @@ class ParserTest {
         );
     }
 
+    /** Verifies that malformed event variants report format errors. */
     @Test
     void parse_malformedEventVariants_throwFormatError() {
         NovaException missingEnd = assertThrows(NovaException.class,
@@ -198,6 +213,7 @@ class ParserTest {
         );
     }
 
+    /** Verifies that whitespace around a todo description is handled. */
     @Test
     void parse_whitespaceAroundTodoDescription_isHandled() throws NovaException {
         Parser.ParsedCommand result = parser.parse("todo   read book   ");
@@ -205,6 +221,7 @@ class ParserTest {
         assertEquals("read book", result.description());
     }
 
+    /** Verifies that commands with similar prefixes remain unknown. */
     @Test
     void parse_commandWithSimilarPrefix_isUnknown() {
         NovaException exception = assertThrows(NovaException.class,
@@ -213,6 +230,7 @@ class ParserTest {
         assertEquals("I don't recognize that command.", exception.getMessage());
     }
 
+    /** Verifies that unknown commands produce a clear error. */
     @Test
     void parse_unknownCommand_throwsClearError() {
         NovaException exception = assertThrows(NovaException.class,
