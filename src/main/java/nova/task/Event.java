@@ -21,7 +21,7 @@ public class Event extends Task {
         this.to = to;
     }
 
-    /** @return the event description with its time-range suffix */
+    /** Returns the event description with its time-range suffix. */
     @Override
     public String getDisplayDescription() {
         return description + " (from: " + from + " to: " + to + ")";

@@ -34,6 +34,8 @@ Use lightweight tags unless the user requests an annotated tag.
 When proposing or creating a commit message, include enough detail to explain the rationale for the change.
 Do not commit or push unless explicitly asked.
 
+Before every commit or branch creation, use the project-local `$seedu-git-standard` skill. Its rules are mandatory for commit subjects, commit bodies, and branch names: use imperative, capitalized, punctuation-free subjects; concise subject lengths; informative 72-column bodies explaining what and why; and meaningful kebab-case branch names while preserving any higher-priority repository prefix.
+
 ## UI testing after code changes
 
 After every code update:
@@ -46,3 +48,7 @@ After every code update:
 Maintain JUnit tests for approximately the top 50% of methods by value, prioritizing complex, core, and business-critical logic over trivial accessors.
 
 After every code change, review and update the relevant JUnit tests to keep this coverage target accurate. Run the Gradle JUnit test task and report any failures before handing off the change.
+
+## Java coding standard
+
+For every Java code change, use the project-local `$seedu-java-coding-standard` skill. It is mandatory and is based on the [SE-EDU Java coding standard](https://se-education.org/guides/conventions/java/intermediate.html). Follow its naming, package, layout, import, brace, line-length, comment, and JavaDoc rules. Review the touched Java files against the skill before handoff.
