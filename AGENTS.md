@@ -48,3 +48,7 @@ After every code update:
 Maintain JUnit tests for approximately the top 50% of methods by value, prioritizing complex, core, and business-critical logic over trivial accessors.
 
 After every code change, review and update the relevant JUnit tests to keep this coverage target accurate. Run the Gradle JUnit test task and report any failures before handing off the change.
+
+## Java coding standard
+
+For every Java code change, use the project-local `$seedu-java-coding-standard` skill. It is mandatory and is based on the [SE-EDU Java coding standard](https://se-education.org/guides/conventions/java/intermediate.html). Follow its naming, package, layout, import, brace, line-length, comment, and JavaDoc rules. Review the touched Java files against the skill before handoff.
