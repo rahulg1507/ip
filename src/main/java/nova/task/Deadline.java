@@ -22,7 +22,7 @@ public class Deadline extends Task {
         this.by = by;
     }
 
-    /** @return the task description with its deadline suffix */
+    /** Returns the task description with its deadline suffix. */
     @Override
     public String getDisplayDescription() {
         return description + " (by: " + by.format(DISPLAY_FORMAT) + ")";

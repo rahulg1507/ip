@@ -12,7 +12,7 @@ public class ExitCommand extends Command {
         ui.showFarewell();
     }
 
-    /** @return true because this command ends the application */
+    /** Returns true because this command ends the application. */
     @Override
     public boolean isExit() {
         return true;
