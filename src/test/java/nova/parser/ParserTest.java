@@ -40,6 +40,33 @@ class ParserTest {
     }
 
     @Test
+    void parse_taskNumberCommands_acceptsZeroAndNegativeNumbers() throws NovaException {
+        Parser.ParsedCommand zero = parser.parse("mark 0");
+        Parser.ParsedCommand negative = parser.parse("delete -3");
+
+        assertAll(
+                () -> assertEquals(0, zero.taskNumber()),
+                () -> assertEquals(-3, negative.taskNumber())
+        );
+    }
+
+    @Test
+    void parse_missingTaskNumbers_throwClearError() {
+        NovaException markException = assertThrows(NovaException.class,
+                () -> parser.parse("mark"));
+        NovaException unmarkException = assertThrows(NovaException.class,
+                () -> parser.parse("unmark"));
+        NovaException deleteException = assertThrows(NovaException.class,
+                () -> parser.parse("delete"));
+
+        assertAll(
+                () -> assertEquals("Please provide a valid task number.", markException.getMessage()),
+                () -> assertEquals("Please provide a valid task number.", unmarkException.getMessage()),
+                () -> assertEquals("Please provide a valid task number.", deleteException.getMessage())
+        );
+    }
+
+    @Test
     void parse_todoCommand_trimsDescription() throws NovaException {
         Parser.ParsedCommand result = parser.parse("todo   buy milk  ");
 
@@ -84,6 +111,21 @@ class ParserTest {
     }
 
     @Test
+    void parse_dateCommandsWithInvalidDates_throwClearError() {
+        NovaException deadlineException = assertThrows(NovaException.class,
+                () -> parser.parse("deadline task /by 24-08-2026"));
+        NovaException onException = assertThrows(NovaException.class,
+                () -> parser.parse("on 2026/08/24"));
+
+        assertAll(
+                () -> assertEquals("Please use a valid date in yyyy-MM-dd format.",
+                        deadlineException.getMessage()),
+                () -> assertEquals("Please use a valid date in yyyy-MM-dd format.",
+                        onException.getMessage())
+        );
+    }
+
+    @Test
     void parse_invalidTaskNumber_throwsClearError() {
         NovaException exception = assertThrows(NovaException.class,
                 () -> parser.parse("mark abc"));
@@ -120,6 +162,55 @@ class ParserTest {
                 () -> assertEquals("Please use: event DESCRIPTION /from START /to END.",
                         eventException.getMessage())
         );
+    }
+
+    @Test
+    void parse_malformedDeadlineVariants_throwFormatError() {
+        NovaException missingDate = assertThrows(NovaException.class,
+                () -> parser.parse("deadline task /by "));
+        NovaException missingDescription = assertThrows(NovaException.class,
+                () -> parser.parse("deadline /by 2026-08-24"));
+
+        assertAll(
+                () -> assertEquals("Please use: deadline DESCRIPTION /by DATE.",
+                        missingDate.getMessage()),
+                () -> assertEquals("Please use: deadline DESCRIPTION /by DATE.",
+                        missingDescription.getMessage())
+        );
+    }
+
+    @Test
+    void parse_malformedEventVariants_throwFormatError() {
+        NovaException missingEnd = assertThrows(NovaException.class,
+                () -> parser.parse("event meeting /from Monday /to "));
+        NovaException missingStart = assertThrows(NovaException.class,
+                () -> parser.parse("event meeting /to Tuesday"));
+        NovaException reversedMarkers = assertThrows(NovaException.class,
+                () -> parser.parse("event meeting /to Tuesday /from Monday"));
+
+        assertAll(
+                () -> assertEquals("Please use: event DESCRIPTION /from START /to END.",
+                        missingEnd.getMessage()),
+                () -> assertEquals("Please use: event DESCRIPTION /from START /to END.",
+                        missingStart.getMessage()),
+                () -> assertEquals("Please use: event DESCRIPTION /from START /to END.",
+                        reversedMarkers.getMessage())
+        );
+    }
+
+    @Test
+    void parse_whitespaceAroundTodoDescription_isHandled() throws NovaException {
+        Parser.ParsedCommand result = parser.parse("todo   read book   ");
+
+        assertEquals("read book", result.description());
+    }
+
+    @Test
+    void parse_commandWithSimilarPrefix_isUnknown() {
+        NovaException exception = assertThrows(NovaException.class,
+                () -> parser.parse("listing"));
+
+        assertEquals("I don't recognize that command.", exception.getMessage());
     }
 
     @Test
