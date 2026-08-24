@@ -40,3 +40,9 @@ After every code update:
 
 1. Update `test/ui-test-plan.md` whenever the change affects a command, console output, or another behavior covered by the UI tests. Keep each test case's aim, inputs, and expected output accurate.
 2. Invoke the `$test-ui` skill and run the UI test plan. Show the resulting console input/output record. If a test fails, stop and report its expected and actual output.
+
+## JUnit test coverage
+
+Maintain JUnit tests for approximately the top 50% of methods by value, prioritizing complex, core, and business-critical logic over trivial accessors.
+
+After every code change, review and update the relevant JUnit tests to keep this coverage target accurate. Run the Gradle JUnit test task and report any failures before handing off the change.
