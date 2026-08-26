@@ -8,7 +8,7 @@ import nova.exception.NovaException;
 public class Parser {
     /** The command categories understood by Nova. */
     public enum CommandType {
-        EXIT, LIST, ON, MARK, UNMARK, DELETE, TODO, DEADLINE, EVENT
+        EXIT, LIST, FIND, ON, MARK, UNMARK, DELETE, TODO, DEADLINE, EVENT
     }
 
     /** The validated result of parsing one user command. */
@@ -23,6 +23,13 @@ public class Parser {
         }
         if (command.equals("list")) {
             return new ParsedCommand(CommandType.LIST, 0, "", null, "", "");
+        }
+        if (command.trim().equals("find") || command.startsWith("find ")) {
+            String keyword = command.trim().equals("find") ? "" : command.substring(5).trim();
+            if (keyword.isEmpty()) {
+                throw new NovaException("Please add a keyword after 'find'.");
+            }
+            return new ParsedCommand(CommandType.FIND, 0, keyword, null, "", "");
         }
         if (command.startsWith("on ")) {
             return new ParsedCommand(CommandType.ON, 0, "", parseDate(command.substring(3).trim()), "", "");

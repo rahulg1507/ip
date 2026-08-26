@@ -18,6 +18,74 @@ Expected output:
     Bye. Hope to see you again soon!
     ____________________________________________________________
 
+## Find matching tasks
+Aim: Verify that find searches task descriptions case-insensitively and numbers only matching results.
+Inputs:
+    todo read book
+    deadline return book /by 2026-06-06
+    todo wash dishes
+    find BOOK
+    bye
+Expected output:
+    ____________________________________________________________
+     _   _    ___    _   _    _
+    | \ | |  / _ \  | | | |  / \
+    |  \| | | | | | | | | | / _ \
+    | |\  | | |_| |  \ V / / ___ \
+    |_| \_|  \___/    \_/ /_/   \_\
+    Hello! I'm Nova.
+    What can I do for you?
+    ____________________________________________________________
+    ____________________________________________________________
+     Got it. I've added this task:
+      [T][ ] read book
+     Now you have 1 tasks in the list.
+    ____________________________________________________________
+    ____________________________________________________________
+     Got it. I've added this task:
+      [D][ ] return book (by: Jun 6 2026)
+     Now you have 2 tasks in the list.
+    ____________________________________________________________
+    ____________________________________________________________
+     Got it. I've added this task:
+      [T][ ] wash dishes
+     Now you have 3 tasks in the list.
+    ____________________________________________________________
+    ____________________________________________________________
+     Here are the matching tasks in your list:
+     1.[T][ ] read book
+     2.[D][ ] return book (by: Jun 6 2026)
+    ____________________________________________________________
+    ____________________________________________________________
+    Bye. Hope to see you again soon!
+    ____________________________________________________________
+
+## Handle find edge cases
+Aim: Verify that an empty keyword is rejected and a valid keyword with no matches reports no results.
+Inputs:
+    find
+    find nonexistent
+    bye
+Expected output:
+    ____________________________________________________________
+     _   _    ___    _   _    _
+    | \ | |  / _ \  | | | |  / \
+    |  \| | | | | | | | | | / _ \
+    | |\  | | |_| |  \ V / / ___ \
+    |_| \_|  \___/    \_/ /_/   \_\
+    Hello! I'm Nova.
+    What can I do for you?
+    ____________________________________________________________
+    ____________________________________________________________
+     Please add a keyword after 'find'.
+    ____________________________________________________________
+    ____________________________________________________________
+     No matching tasks found.
+    ____________________________________________________________
+    ____________________________________________________________
+    Bye. Hope to see you again soon!
+    ____________________________________________________________
+
 ## Handle invalid commands
 Aim: Verify that an empty todo and an unrecognized command produce errors without adding tasks.
 Inputs:

@@ -62,6 +62,18 @@ public class Ui {
         }
     }
 
+    /** Prints matching tasks in a newly numbered list or a no-results message. */
+    public void showMatchingTasks(ArrayList<Task> tasks) {
+        if (tasks.isEmpty()) {
+            System.out.println(" No matching tasks found.");
+            return;
+        }
+        System.out.println(" Here are the matching tasks in your list:");
+        for (int i = 0; i < tasks.size(); i++) {
+            System.out.println(" " + (i + 1) + "." + tasks.get(i));
+        }
+    }
+
     /** Prints tasks matching a requested date. */
     public void showTasksOn(LocalDate date, ArrayList<Task> tasks) {
         System.out.println(" Tasks on " + date + ":");
