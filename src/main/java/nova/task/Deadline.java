@@ -5,11 +5,11 @@ import java.time.format.DateTimeFormatter;
 
 /** Represents a task that must be completed by a calendar date. */
 public class Deadline extends Task {
-    /** The deadline date. */
-    protected LocalDate by;
-
     /** The format used when showing dates to the user. */
     private static final DateTimeFormatter DISPLAY_FORMAT = DateTimeFormatter.ofPattern("MMM d yyyy");
+
+    /** The deadline date. */
+    protected LocalDate by;
 
     /**
      * Creates an incomplete deadline task.

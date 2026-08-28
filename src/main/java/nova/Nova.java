@@ -30,7 +30,7 @@ public class Nova {
             try {
                 Parser.ParsedCommand parsedCommand = parser.parse(command);
                 if (handler.execute(parsedCommand)) {
-                break;
+                    break;
                 }
             } catch (NovaException exception) {
                 ui.showError(exception);

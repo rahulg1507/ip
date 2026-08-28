@@ -7,8 +7,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
-import nova.exception.NovaException;
+
 import org.junit.jupiter.api.Test;
+
+import nova.exception.NovaException;
 
 /** Tests task-list operations that drive the chatbot's core task behavior. */
 class TaskListTest {
@@ -39,8 +41,7 @@ class TaskListTest {
         TaskList tasks = new TaskList();
         tasks.add(new Todo("only task"));
 
-        NovaException exception = assertThrows(NovaException.class,
-                () -> tasks.getByNumber(0));
+        NovaException exception = assertThrows(NovaException.class, () -> tasks.getByNumber(0));
 
         assertEquals("Please provide a valid task number.", exception.getMessage());
     }

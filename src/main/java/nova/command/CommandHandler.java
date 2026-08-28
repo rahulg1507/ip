@@ -1,6 +1,7 @@
 package nova.command;
 
 import java.util.ArrayList;
+
 import nova.exception.NovaException;
 import nova.parser.Parser;
 import nova.storage.Storage;
@@ -27,55 +28,56 @@ public class CommandHandler {
     /** Executes a parsed command and returns whether the application should exit. */
     public boolean execute(Parser.ParsedCommand command) throws NovaException {
         switch (command.type()) {
-        case EXIT -> {
-            Command exitCommand = new ExitCommand();
-            exitCommand.execute(tasks, ui, storage);
-            return exitCommand.isExit();
-        }
-        case LIST -> ui.showTaskList(tasks);
-        case FIND -> {
-            ArrayList<Task> matchingTasks = tasks.find(command.description());
-            ui.showMatchingTasks(matchingTasks);
-        }
-        case ON -> ui.showTasksOn(command.date(), tasks.getTasksOn(command.date()));
-        case MARK -> {
-            int taskNumber = command.taskNumber();
-            Task task = tasks.getByNumber(taskNumber);
-            tasks.markAsDone(taskNumber);
-            try {
-                storage.save(tasks);
-            } catch (NovaException exception) {
-                tasks.markAsNotDone(taskNumber);
-                throw exception;
+            case EXIT -> {
+                Command exitCommand = new ExitCommand();
+                exitCommand.execute(tasks, ui, storage);
+                return exitCommand.isExit();
             }
-            ui.showMarkedDone(task);
-        }
-        case UNMARK -> {
-            int taskNumber = command.taskNumber();
-            Task task = tasks.getByNumber(taskNumber);
-            tasks.markAsNotDone(taskNumber);
-            try {
-                storage.save(tasks);
-            } catch (NovaException exception) {
+            case LIST -> ui.showTaskList(tasks);
+            case FIND -> {
+                ArrayList<Task> matchingTasks = tasks.find(command.description());
+                ui.showMatchingTasks(matchingTasks);
+            }
+            case ON -> ui.showTasksOn(command.date(), tasks.getTasksOn(command.date()));
+            case MARK -> {
+                int taskNumber = command.taskNumber();
+                Task task = tasks.getByNumber(taskNumber);
                 tasks.markAsDone(taskNumber);
-                throw exception;
+                try {
+                    storage.save(tasks);
+                } catch (NovaException exception) {
+                    tasks.markAsNotDone(taskNumber);
+                    throw exception;
+                }
+                ui.showMarkedDone(task);
             }
-            ui.showMarkedNotDone(task);
-        }
-        case DELETE -> {
-            int taskNumber = command.taskNumber();
-            Task deletedTask = tasks.removeByNumber(taskNumber);
-            try {
-                storage.save(tasks);
-            } catch (NovaException exception) {
-                tasks.add(taskNumber - 1, deletedTask);
-                throw exception;
+            case UNMARK -> {
+                int taskNumber = command.taskNumber();
+                Task task = tasks.getByNumber(taskNumber);
+                tasks.markAsNotDone(taskNumber);
+                try {
+                    storage.save(tasks);
+                } catch (NovaException exception) {
+                    tasks.markAsDone(taskNumber);
+                    throw exception;
+                }
+                ui.showMarkedNotDone(task);
             }
-            ui.showDeleted(deletedTask, tasks.size());
-        }
-        case TODO -> addAndShow(new Todo(command.description()));
-        case DEADLINE -> addAndShow(new Deadline(command.description(), command.date()));
-        case EVENT -> addAndShow(new Event(command.description(), command.from(), command.to()));
+            case DELETE -> {
+                int taskNumber = command.taskNumber();
+                Task deletedTask = tasks.removeByNumber(taskNumber);
+                try {
+                    storage.save(tasks);
+                } catch (NovaException exception) {
+                    tasks.add(taskNumber - 1, deletedTask);
+                    throw exception;
+                }
+                ui.showDeleted(deletedTask, tasks.size());
+            }
+            case TODO -> addAndShow(new Todo(command.description()));
+            case DEADLINE -> addAndShow(new Deadline(command.description(), command.date()));
+            case EVENT -> addAndShow(new Event(command.description(), command.from(), command.to()));
+            default -> throw new NovaException("Unsupported command.");
         }
         return false;
     }
