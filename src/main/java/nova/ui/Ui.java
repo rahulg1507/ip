@@ -1,5 +1,6 @@
 package nova.ui;
 
+import java.io.PrintStream;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Scanner;
@@ -16,22 +17,31 @@ public class Ui {
     /** Reads commands from the console. */
     private final Scanner scanner;
 
+    /** Receives user-facing output. */
+    private final PrintStream output;
+
     /** Creates a console UI using standard input. */
     public Ui() {
+        this(System.out);
+    }
+
+    /** Creates a UI that reads standard input and writes to the given output. */
+    public Ui(PrintStream output) {
         scanner = new Scanner(System.in);
+        this.output = output;
     }
 
     /** Prints Nova's greeting. */
     public void showGreeting() {
-        System.out.println(DIVIDER);
-        System.out.print(" _   _    ___    _   _    _\n"
+        output.println(DIVIDER);
+        output.print(" _   _    ___    _   _    _\n"
                 + "| \\ | |  / _ \\  | | | |  / \\\n"
                 + "|  \\| | | | | | | | | | / _ \\\n"
                 + "| |\\  | | |_| |  \\ V / / ___ \\\n"
                 + "|_| \\_|  \\___/    \\_/ /_/   \\_\\\n");
-        System.out.println("Hello! I'm Nova.");
-        System.out.println("What can I do for you?");
-        System.out.println(DIVIDER);
+        output.println("Hello! I'm Nova.");
+        output.println("What can I do for you?");
+        output.println(DIVIDER);
     }
 
     /** Returns whether another command is available. */
@@ -46,71 +56,71 @@ public class Ui {
 
     /** Prints the interaction divider. */
     public void showDivider() {
-        System.out.println(DIVIDER);
+        output.println(DIVIDER);
     }
 
     /** Prints the farewell and its closing divider. */
     public void showFarewell() {
-        System.out.println("Bye. Hope to see you again soon!");
+        output.println("Bye. Hope to see you again soon!");
         showDivider();
     }
 
     /** Prints all tasks in their numbered list format. */
     public void showTaskList(TaskList tasks) {
-        System.out.println(" Here are the tasks in your list:");
+        output.println(" Here are the tasks in your list:");
         for (int i = 0; i < tasks.size(); i++) {
-            System.out.println(" " + (i + 1) + "." + tasks.get(i));
+            output.println(" " + (i + 1) + "." + tasks.get(i));
         }
     }
 
     /** Prints matching tasks in a newly numbered list or a no-results message. */
     public void showMatchingTasks(ArrayList<Task> tasks) {
         if (tasks.isEmpty()) {
-            System.out.println(" No matching tasks found.");
+            output.println(" No matching tasks found.");
             return;
         }
-        System.out.println(" Here are the matching tasks in your list:");
+        output.println(" Here are the matching tasks in your list:");
         for (int i = 0; i < tasks.size(); i++) {
-            System.out.println(" " + (i + 1) + "." + tasks.get(i));
+            output.println(" " + (i + 1) + "." + tasks.get(i));
         }
     }
 
     /** Prints tasks matching a requested date. */
     public void showTasksOn(LocalDate date, ArrayList<Task> tasks) {
-        System.out.println(" Tasks on " + date + ":");
+        output.println(" Tasks on " + date + ":");
         for (Task task : tasks) {
-            System.out.println(" " + task);
+            output.println(" " + task);
         }
     }
 
     /** Prints a successful task-addition confirmation. */
     public void showAdded(Task task, int taskCount) {
-        System.out.println(" Got it. I've added this task:");
-        System.out.println("  " + task);
-        System.out.println(" Now you have " + taskCount + " tasks in the list.");
+        output.println(" Got it. I've added this task:");
+        output.println("  " + task);
+        output.println(" Now you have " + taskCount + " tasks in the list.");
     }
 
     /** Prints a completion confirmation. */
     public void showMarkedDone(Task task) {
-        System.out.println(" Nice! I've marked this task as done:");
-        System.out.println("   " + task);
+        output.println(" Nice! I've marked this task as done:");
+        output.println("   " + task);
     }
 
     /** Prints an uncompletion confirmation. */
     public void showMarkedNotDone(Task task) {
-        System.out.println(" OK, I've marked this task as not done yet:");
-        System.out.println("   " + task);
+        output.println(" OK, I've marked this task as not done yet:");
+        output.println("   " + task);
     }
 
     /** Prints a deletion confirmation. */
     public void showDeleted(Task task, int taskCount) {
-        System.out.println(" Noted. I've removed this task:");
-        System.out.println("   " + task);
-        System.out.println(" Now you have " + taskCount + " tasks in the list.");
+        output.println(" Noted. I've removed this task:");
+        output.println("   " + task);
+        output.println(" Now you have " + taskCount + " tasks in the list.");
     }
 
     /** Prints a user-facing error. */
     public void showError(NovaException exception) {
-        System.out.println(" " + exception.getMessage());
+        output.println(" " + exception.getMessage());
     }
 }
