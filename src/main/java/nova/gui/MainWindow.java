@@ -42,7 +42,7 @@ public class MainWindow extends AnchorPane {
     private final Image novaImage = new Image(this.getClass().getResourceAsStream("/images/DaDuke.png"));
 
     /** Binds the GUI controller to Nova's parser, command handler, storage, and task list. */
-    public void setNovaLogic(Storage storage, TaskList tasks, Parser parser) {
+    public void bindNovaComponents(Storage storage, TaskList tasks, Parser parser) {
         this.parser = parser;
         this.ui = new Ui(responseStream);
         this.commandHandler = new CommandHandler(storage, tasks, ui);

@@ -86,7 +86,7 @@ public class Ui {
     }
 
     /** Prints tasks matching a requested date. */
-    public void showTasksOn(LocalDate date, ArrayList<Task> tasks) {
+    public void showTasksOnDate(LocalDate date, ArrayList<Task> tasks) {
         output.println(" Tasks on " + date + ":");
         for (Task task : tasks) {
             output.println(" " + task);
