@@ -27,7 +27,7 @@ public class Main extends Application {
             Storage storage = new Storage();
             TaskList tasks = storage.load();
             Parser parser = new Parser();
-            fxmlLoader.<MainWindow>getController().setNovaLogic(storage, tasks, parser);
+            fxmlLoader.<MainWindow>getController().bindNovaComponents(storage, tasks, parser);
 
             stage.show();
         } catch (IOException exception) {

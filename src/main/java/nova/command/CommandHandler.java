@@ -29,16 +29,16 @@ public class CommandHandler {
     public boolean execute(Parser.ParsedCommand command) throws NovaException {
         switch (command.type()) {
             case EXIT -> {
-                Command exitCommand = new ExitCommand();
+                CommandAction exitCommand = new ExitCommand();
                 exitCommand.execute(tasks, ui, storage);
                 return exitCommand.isExit();
             }
             case LIST -> ui.showTaskList(tasks);
             case FIND -> {
-                ArrayList<Task> matchingTasks = tasks.find(command.description());
+                ArrayList<Task> matchingTasks = tasks.findByKeyword(command.description());
                 ui.showMatchingTasks(matchingTasks);
             }
-            case ON -> ui.showTasksOn(command.date(), tasks.getTasksOn(command.date()));
+            case ON -> ui.showTasksOnDate(command.date(), tasks.getTasksOnDate(command.date()));
             case MARK -> {
                 int taskNumber = command.taskNumber();
                 Task task = tasks.getByNumber(taskNumber);

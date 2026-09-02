@@ -4,8 +4,8 @@ import nova.storage.Storage;
 import nova.task.TaskList;
 import nova.ui.Ui;
 
-/** Command that ends the Nova session. */
-public class ExitCommand extends Command {
+/** Command action that ends the Nova session. */
+public class ExitCommand extends CommandAction {
     /** Shows the farewell message. */
     @Override
     public void execute(TaskList tasks, Ui ui, Storage storage) {

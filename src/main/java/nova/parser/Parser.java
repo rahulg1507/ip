@@ -36,13 +36,13 @@ public class Parser {
             return new ParsedCommand(CommandType.ON, 0, "", parseDate(command.substring(3).trim()), "", "");
         }
         if (command.trim().equals("mark") || command.startsWith("mark ")) {
-            return taskCommand(CommandType.MARK, command, "mark");
+            return createTaskCommand(CommandType.MARK, command, "mark");
         }
         if (command.trim().equals("unmark") || command.startsWith("unmark ")) {
-            return taskCommand(CommandType.UNMARK, command, "unmark");
+            return createTaskCommand(CommandType.UNMARK, command, "unmark");
         }
         if (command.trim().equals("delete") || command.startsWith("delete ")) {
-            return taskCommand(CommandType.DELETE, command, "delete");
+            return createTaskCommand(CommandType.DELETE, command, "delete");
         }
         if (command.trim().equals("todo") || command.startsWith("todo ")) {
             String description = command.trim().equals("todo") ? "" : command.substring(5).trim();
@@ -71,8 +71,8 @@ public class Parser {
         throw new NovaException("I don't recognize that command.");
     }
 
-    /** Parses a command whose only argument is a task number. */
-    private static ParsedCommand taskCommand(CommandType type, String command, String commandWord)
+    /** Creates a parsed command whose only argument is a task number. */
+    private static ParsedCommand createTaskCommand(CommandType type, String command, String commandWord)
             throws NovaException {
         try {
             int taskNumber = Integer.parseInt(command.substring(commandWord.length()).trim());

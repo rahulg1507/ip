@@ -89,7 +89,7 @@ class TaskListTest {
 
     /** Verifies that date filtering returns matching deadlines and events only. */
     @Test
-    void getTasksOn_returnsMatchingDeadlinesAndEvents_only() {
+    void getTasksOnDate_returnsMatchingDeadlinesAndEvents_only() {
         LocalDate targetDate = LocalDate.of(2026, 8, 24);
         TaskList tasks = new TaskList();
         tasks.add(new Todo("ordinary task"));
@@ -97,7 +97,7 @@ class TaskListTest {
         tasks.add(new Event("event", "2026-08-24 9am", "2026-08-24 10am"));
         tasks.add(new Deadline("different date", targetDate.plusDays(1)));
 
-        ArrayList<Task> matchingTasks = tasks.getTasksOn(targetDate);
+        ArrayList<Task> matchingTasks = tasks.getTasksOnDate(targetDate);
 
         assertEquals(2, matchingTasks.size());
         assertEquals("deadline", matchingTasks.get(0).getDescription());
@@ -113,7 +113,7 @@ class TaskListTest {
         tasks.add(new Deadline("Return BOOK", LocalDate.of(2026, 8, 24)));
         tasks.add(new Event("Attend meeting", "Monday 9am", "Monday 10am"));
 
-        ArrayList<Task> matchingTasks = tasks.find("book");
+        ArrayList<Task> matchingTasks = tasks.findByKeyword("book");
 
         assertEquals(2, matchingTasks.size());
         assertEquals("Read a book", matchingTasks.get(0).getDescription());
@@ -126,6 +126,6 @@ class TaskListTest {
         TaskList tasks = new TaskList();
         tasks.add(new Todo("Read a book"));
 
-        assertTrue(tasks.find("calendar").isEmpty());
+        assertTrue(tasks.findByKeyword("calendar").isEmpty());
     }
 }

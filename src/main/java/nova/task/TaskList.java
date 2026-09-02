@@ -62,7 +62,7 @@ public class TaskList implements Iterable<Task> {
     }
 
     /** Returns deadlines and events that occur on the requested date. */
-    public ArrayList<Task> getTasksOn(LocalDate date) {
+    public ArrayList<Task> getTasksOnDate(LocalDate date) {
         ArrayList<Task> matchingTasks = new ArrayList<>();
         for (Task task : tasks) {
             if (task instanceof Deadline deadline && deadline.by.equals(date)) {
@@ -76,7 +76,7 @@ public class TaskList implements Iterable<Task> {
     }
 
     /** Returns tasks whose descriptions contain the keyword, ignoring letter case. */
-    public ArrayList<Task> find(String keyword) {
+    public ArrayList<Task> findByKeyword(String keyword) {
         String normalizedKeyword = keyword.toLowerCase(Locale.ROOT);
         ArrayList<Task> matchingTasks = new ArrayList<>();
         for (Task task : tasks) {
