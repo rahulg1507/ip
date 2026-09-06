@@ -30,6 +30,7 @@ public class Task {
      * @param taskType the kind of task being created
      */
     protected Task(String description, TaskType taskType) {
+        assert taskType != null : "Task type should never be null";
         this.description = description;
         this.taskType = taskType;
         this.status = TaskStatus.NOT_DONE;

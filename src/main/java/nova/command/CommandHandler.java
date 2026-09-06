@@ -77,7 +77,10 @@ public class CommandHandler {
             case TODO -> addAndShow(new Todo(command.description()));
             case DEADLINE -> addAndShow(new Deadline(command.description(), command.date()));
             case EVENT -> addAndShow(new Event(command.description(), command.from(), command.to()));
-            default -> throw new NovaException("Unsupported command.");
+            default -> {
+                assert false : "Every command type should have an execution branch";
+                throw new NovaException("Unsupported command.");
+            }
         }
         return false;
     }
@@ -85,6 +88,8 @@ public class CommandHandler {
     /** Adds a task, persists it, and reports the successful addition. */
     private void addAndShow(Task task) throws NovaException {
         tasks.add(task);
+        assert tasks.size() > 0 && tasks.get(tasks.size() - 1) == task
+                : "Added task should be present at the end of the task list";
         try {
             storage.save(tasks);
         } catch (NovaException exception) {
