@@ -25,50 +25,75 @@ public class Parser {
         if (command.equals("list")) {
             return new ParsedCommand(CommandType.LIST, 0, "", null, "", "");
         }
-        if (command.trim().equals("find") || command.startsWith("find ")) {
-            String keyword = command.trim().equals("find") ? "" : command.substring(5).trim();
-            if (keyword.isEmpty()) {
-                throw new NovaException("Please add a keyword after 'find'.");
-            }
-            return new ParsedCommand(CommandType.FIND, 0, keyword, null, "", "");
+        if (isCommandWithOptionalArgument(command, "find")) {
+            return parseFindCommand(command);
         }
         if (command.startsWith("on ")) {
             return new ParsedCommand(CommandType.ON, 0, "", parseDate(command.substring(3).trim()), "", "");
         }
-        if (command.trim().equals("mark") || command.startsWith("mark ")) {
+        if (isCommandWithOptionalArgument(command, "mark")) {
             return createTaskCommand(CommandType.MARK, command, "mark");
         }
-        if (command.trim().equals("unmark") || command.startsWith("unmark ")) {
+        if (isCommandWithOptionalArgument(command, "unmark")) {
             return createTaskCommand(CommandType.UNMARK, command, "unmark");
         }
-        if (command.trim().equals("delete") || command.startsWith("delete ")) {
+        if (isCommandWithOptionalArgument(command, "delete")) {
             return createTaskCommand(CommandType.DELETE, command, "delete");
         }
-        if (command.trim().equals("todo") || command.startsWith("todo ")) {
-            String description = command.trim().equals("todo") ? "" : command.substring(5).trim();
-            if (description.isEmpty()) {
-                throw new NovaException("Please add a description after 'todo'.");
-            }
-            return new ParsedCommand(CommandType.TODO, 0, description, null, "", "");
+        if (isCommandWithOptionalArgument(command, "todo")) {
+            return parseTodoCommand(command);
         }
         if (command.startsWith("deadline ")) {
-            int byIndex = command.indexOf(" /by ");
-            if (byIndex <= 9 || byIndex + 5 >= command.length()) {
-                throw new NovaException("Please use: deadline DESCRIPTION /by DATE.");
-            }
-            return new ParsedCommand(CommandType.DEADLINE, 0, command.substring(9, byIndex),
-                    parseDate(command.substring(byIndex + 5)), "", "");
+            return parseDeadlineCommand(command);
         }
         if (command.startsWith("event ")) {
-            int fromIndex = command.indexOf(" /from ");
-            int toIndex = command.indexOf(" /to ");
-            if (fromIndex <= 6 || toIndex <= fromIndex + 7 || toIndex + 5 >= command.length()) {
-                throw new NovaException("Please use: event DESCRIPTION /from START /to END.");
-            }
-            return new ParsedCommand(CommandType.EVENT, 0, command.substring(6, fromIndex), null,
-                    command.substring(fromIndex + 7, toIndex), command.substring(toIndex + 5));
+            return parseEventCommand(command);
         }
         throw new NovaException("I don't recognize that command.");
+    }
+
+    /** Returns whether a command is either complete or followed by an argument. */
+    private static boolean isCommandWithOptionalArgument(String command, String commandWord) {
+        return command.trim().equals(commandWord) || command.startsWith(commandWord + " ");
+    }
+
+    /** Parses a find command and validates its keyword. */
+    private static ParsedCommand parseFindCommand(String command) throws NovaException {
+        String keyword = command.trim().equals("find") ? "" : command.substring(5).trim();
+        if (keyword.isEmpty()) {
+            throw new NovaException("Please add a keyword after 'find'.");
+        }
+        return new ParsedCommand(CommandType.FIND, 0, keyword, null, "", "");
+    }
+
+    /** Parses a todo command and validates its description. */
+    private static ParsedCommand parseTodoCommand(String command) throws NovaException {
+        String description = command.trim().equals("todo") ? "" : command.substring(5).trim();
+        if (description.isEmpty()) {
+            throw new NovaException("Please add a description after 'todo'.");
+        }
+        return new ParsedCommand(CommandType.TODO, 0, description, null, "", "");
+    }
+
+    /** Parses a deadline command and validates its format and date. */
+    private static ParsedCommand parseDeadlineCommand(String command) throws NovaException {
+        int byIndex = command.indexOf(" /by ");
+        if (byIndex <= 9 || byIndex + 5 >= command.length()) {
+            throw new NovaException("Please use: deadline DESCRIPTION /by DATE.");
+        }
+        return new ParsedCommand(CommandType.DEADLINE, 0, command.substring(9, byIndex),
+                parseDate(command.substring(byIndex + 5)), "", "");
+    }
+
+    /** Parses an event command and validates its time range. */
+    private static ParsedCommand parseEventCommand(String command) throws NovaException {
+        int fromIndex = command.indexOf(" /from ");
+        int toIndex = command.indexOf(" /to ");
+        if (fromIndex <= 6 || toIndex <= fromIndex + 7 || toIndex + 5 >= command.length()) {
+            throw new NovaException("Please use: event DESCRIPTION /from START /to END.");
+        }
+        return new ParsedCommand(CommandType.EVENT, 0, command.substring(6, fromIndex), null,
+                command.substring(fromIndex + 7, toIndex), command.substring(toIndex + 5));
     }
 
     /** Creates a parsed command whose only argument is a task number. */

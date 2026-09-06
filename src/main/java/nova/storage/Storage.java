@@ -64,12 +64,7 @@ public class Storage {
                 lines.add(task.toStorageString());
             }
             Files.write(temporaryFile, lines);
-            try {
-                Files.move(temporaryFile, taskFile, StandardCopyOption.ATOMIC_MOVE,
-                        StandardCopyOption.REPLACE_EXISTING);
-            } catch (IOException exception) {
-                Files.move(temporaryFile, taskFile, StandardCopyOption.REPLACE_EXISTING);
-            }
+            replaceTaskFile(temporaryFile);
         } catch (IOException exception) {
             try {
                 Files.deleteIfExists(temporaryFile);
@@ -77,6 +72,16 @@ public class Storage {
                 // Preserve the original save failure for the user.
             }
             throw new NovaException("Unable to save tasks.");
+        }
+    }
+
+    /** Replaces the task file atomically when the file system supports it. */
+    private void replaceTaskFile(Path temporaryFile) throws IOException {
+        try {
+            Files.move(temporaryFile, taskFile, StandardCopyOption.ATOMIC_MOVE,
+                    StandardCopyOption.REPLACE_EXISTING);
+        } catch (IOException exception) {
+            Files.move(temporaryFile, taskFile, StandardCopyOption.REPLACE_EXISTING);
         }
     }
 
