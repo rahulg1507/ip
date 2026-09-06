@@ -61,6 +61,43 @@ class TaskListTest {
         assertEquals(" ", tasks.get(1).getStatusIcon());
     }
 
+    /** Verifies that adding a duplicate tag is an ignored no-op. */
+    @Test
+    void addTag_duplicateTag_isIgnored() throws NovaException {
+        TaskList tasks = new TaskList();
+        tasks.add(new Todo("read book"));
+
+        assertTrue(tasks.addTag(1, "#reading"));
+        assertFalse(tasks.addTag(1, "#reading"));
+
+        assertEquals(1, tasks.get(0).getTags().size());
+        assertEquals("[T][ ] read book #reading", tasks.get(0).toString());
+    }
+
+    /** Verifies that an existing tag can be removed. */
+    @Test
+    void removeTag_existingTag_isRemoved() throws NovaException {
+        TaskList tasks = new TaskList();
+        tasks.add(new Todo("read book"));
+        tasks.addTag(1, "#reading");
+
+        tasks.removeTag(1, "#reading");
+
+        assertTrue(tasks.get(0).getTags().isEmpty());
+        assertEquals("[T][ ] read book", tasks.get(0).toString());
+    }
+
+    /** Verifies that removing an absent tag produces a clear error. */
+    @Test
+    void removeTag_missingTag_throwsClearError() {
+        TaskList tasks = new TaskList();
+        tasks.add(new Todo("read book"));
+
+        NovaException exception = assertThrows(NovaException.class, () -> tasks.removeTag(1, "#reading"));
+
+        assertEquals("Task does not have the tag #reading.", exception.getMessage());
+    }
+
     /** Verifies that removal preserves the order of remaining tasks. */
     @Test
     void removeByNumber_removesSelectedTaskAndPreservesRemainingOrder() throws NovaException {

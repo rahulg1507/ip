@@ -124,6 +124,18 @@ public class Ui {
         output.println(" Now you have " + taskCount + " tasks in the list.");
     }
 
+    /** Prints a tag confirmation for the updated task. */
+    public void showTagged(Task task) {
+        output.println(" Noted. I've added a tag to this task:");
+        output.println("   " + task);
+    }
+
+    /** Prints an untag confirmation for the updated task. */
+    public void showUntagged(Task task) {
+        output.println(" Noted. I've removed the tag from this task:");
+        output.println("   " + task);
+    }
+
     /** Prints a user-facing error. */
     public void showError(NovaException exception) {
         output.println(" " + exception.getMessage());

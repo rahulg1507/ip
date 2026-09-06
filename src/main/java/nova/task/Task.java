@@ -1,5 +1,9 @@
 package nova.task;
 
+import java.util.Collections;
+import java.util.LinkedHashSet;
+import java.util.Set;
+
 /**
  * Represents a basic task with a description and completion status.
  * Specialized task types extend this class and customize their display.
@@ -13,6 +17,9 @@ public class Task {
 
     /** The completion state of this task. */
     protected TaskStatus status;
+
+    /** The labels attached to this task, in insertion order. */
+    private final Set<String> tags = new LinkedHashSet<>();
 
     /**
      * Creates an incomplete task with the given description.
@@ -82,14 +89,33 @@ public class Task {
         return status.getDisplayIcon();
     }
 
+    /** Adds a tag to this task, ignoring the request if the tag is already present. */
+    public boolean addTag(String tag) {
+        return tags.add(tag);
+    }
+
+    /** Returns whether a tag starts with a hash and contains no whitespace. */
+    public static boolean isValidTag(String tag) {
+        return tag != null && tag.matches("#\\S+");
+    }
+
+    /** Removes a tag from this task and reports whether it was present. */
+    public boolean removeTag(String tag) {
+        return tags.remove(tag);
+    }
+
+    /** Returns the tags attached to this task without exposing the mutable set. */
+    public Set<String> getTags() {
+        return Collections.unmodifiableSet(tags);
+    }
+
     /**
      * Returns this task in the format used for persistent storage.
      *
      * @return the task type, completion state, and description separated by pipes
      */
     public String toStorageString() {
-        return taskType.name().charAt(0) + " | "
-                + (status == TaskStatus.DONE ? "1" : "0") + " | " + description;
+        return getBaseStorageString() + getTagsStorageSuffix();
     }
 
     /**
@@ -99,6 +125,23 @@ public class Task {
      */
     @Override
     public String toString() {
-        return getTypeIcon() + "[" + getStatusIcon() + "] " + description;
+        return getTypeIcon() + "[" + getStatusIcon() + "] " + getDisplayDescription()
+                + getTagsDisplaySuffix();
+    }
+
+    /** Returns the common task fields used at the start of a storage record. */
+    protected String getBaseStorageString() {
+        return taskType.name().charAt(0) + " | "
+                + (status == TaskStatus.DONE ? "1" : "0") + " | " + description;
+    }
+
+    /** Returns the optional storage field containing this task's tags. */
+    protected String getTagsStorageSuffix() {
+        return tags.isEmpty() ? "" : " | " + String.join(" ", tags);
+    }
+
+    /** Returns the optional display suffix containing this task's tags. */
+    private String getTagsDisplaySuffix() {
+        return tags.isEmpty() ? "" : " " + String.join(" ", tags);
     }
 }

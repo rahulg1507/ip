@@ -56,6 +56,18 @@ public class TaskList implements Iterable<Task> {
         getByNumber(taskNumber).markAsNotDone();
     }
 
+    /** Adds a tag to the task at a one-based user-facing position. */
+    public boolean addTag(int taskNumber, String tag) throws NovaException {
+        return getByNumber(taskNumber).addTag(tag);
+    }
+
+    /** Removes a tag from the task or reports that the tag is absent. */
+    public void removeTag(int taskNumber, String tag) throws NovaException {
+        if (!getByNumber(taskNumber).removeTag(tag)) {
+            throw new NovaException("Task does not have the tag " + tag + ".");
+        }
+    }
+
     /** Removes and returns the task at a one-based user-facing position. */
     public Task removeByNumber(int taskNumber) throws NovaException {
         getByNumber(taskNumber);

@@ -59,6 +59,8 @@ public class CommandHandler {
                 saveOrRollback(() -> tasks.add(taskNumber - 1, deletedTask));
                 ui.showDeleted(deletedTask, tasks.size());
             }
+            case TAG -> tagAndShow(command);
+            case UNTAG -> untagAndShow(command);
             case TODO -> addAndShow(new Todo(command.description()));
             case DEADLINE -> addAndShow(new Deadline(command.description(), command.date()));
             case EVENT -> addAndShow(new Event(command.description(), command.from(), command.to()));
@@ -68,6 +70,26 @@ public class CommandHandler {
             }
         }
         return false;
+    }
+
+    /** Adds a tag, persists the change, and reports the updated task. */
+    private void tagAndShow(Parser.ParsedCommand command) throws NovaException {
+        Task task = tasks.getByNumber(command.taskNumber());
+        boolean added = tasks.addTag(command.taskNumber(), command.tag());
+        saveOrRollback(() -> {
+            if (added) {
+                task.removeTag(command.tag());
+            }
+        });
+        ui.showTagged(task);
+    }
+
+    /** Removes a tag, persists the change, and reports the updated task. */
+    private void untagAndShow(Parser.ParsedCommand command) throws NovaException {
+        Task task = tasks.getByNumber(command.taskNumber());
+        tasks.removeTag(command.taskNumber(), command.tag());
+        saveOrRollback(() -> task.addTag(command.tag()));
+        ui.showUntagged(task);
     }
 
     /** Saves the current task state and applies the rollback if saving fails. */

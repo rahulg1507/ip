@@ -35,7 +35,7 @@ public class Deadline extends Task {
      */
     @Override
     public String toStorageString() {
-        return super.toStorageString() + " | " + by;
+        return getBaseStorageString() + " | " + by + getTagsStorageSuffix();
     }
 
     /**
@@ -45,6 +45,6 @@ public class Deadline extends Task {
      */
     @Override
     public String toString() {
-        return super.toString() + " (by: " + by.format(DISPLAY_FORMAT) + ")";
+        return super.toString();
     }
 }
