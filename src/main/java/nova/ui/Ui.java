@@ -68,9 +68,7 @@ public class Ui {
     /** Prints all tasks in their numbered list format. */
     public void showTaskList(TaskList tasks) {
         output.println(" Here are the tasks in your list:");
-        for (int i = 0; i < tasks.size(); i++) {
-            output.println(" " + (i + 1) + "." + tasks.get(i));
-        }
+        showNumberedTasks(tasks);
     }
 
     /** Prints matching tasks in a newly numbered list or a no-results message. */
@@ -80,8 +78,15 @@ public class Ui {
             return;
         }
         output.println(" Here are the matching tasks in your list:");
-        for (int i = 0; i < tasks.size(); i++) {
-            output.println(" " + (i + 1) + "." + tasks.get(i));
+        showNumberedTasks(tasks);
+    }
+
+    /** Prints tasks with one-based display numbers. */
+    private void showNumberedTasks(Iterable<Task> tasks) {
+        int taskNumber = 1;
+        for (Task task : tasks) {
+            output.println(" " + taskNumber + "." + task);
+            taskNumber++;
         }
     }
 
