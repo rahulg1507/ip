@@ -18,6 +18,53 @@ Expected output:
     Bye. Hope to see you again soon!
     ____________________________________________________________
 
+## Tag and untag tasks
+Aim: Verify that tasks accept tags, ignore duplicate tags, remove existing tags, and reject malformed or missing tags.
+Inputs:
+    todo read book
+    tag 1 #fun
+    tag 1 #fun
+    tag 1 fun
+    untag 1 #fun
+    untag 1 #fun
+    bye
+Expected output:
+    ____________________________________________________________
+     _   _    ___    _   _    _
+    | \ | |  / _ \  | | | |  / \
+    |  \| | | | | | | | | | / _ \
+    | |\  | | |_| |  \ V / / ___ \
+    |_| \_|  \___/    \_/ /_/   \_\
+    Hello! I'm Nova.
+    What can I do for you?
+    ____________________________________________________________
+    ____________________________________________________________
+     Got it. I've added this task:
+      [T][ ] read book
+     Now you have 1 tasks in the list.
+    ____________________________________________________________
+    ____________________________________________________________
+     Noted. I've added a tag to this task:
+       [T][ ] read book #fun
+    ____________________________________________________________
+    ____________________________________________________________
+     Noted. I've added a tag to this task:
+       [T][ ] read book #fun
+    ____________________________________________________________
+    ____________________________________________________________
+     Please provide a valid tag in the format #label.
+    ____________________________________________________________
+    ____________________________________________________________
+     Noted. I've removed the tag from this task:
+       [T][ ] read book
+    ____________________________________________________________
+    ____________________________________________________________
+     Task does not have the tag #fun.
+    ____________________________________________________________
+    ____________________________________________________________
+    Bye. Hope to see you again soon!
+    ____________________________________________________________
+
 ## Find matching tasks
 Aim: Verify that find searches task descriptions case-insensitively and numbers only matching results.
 Inputs:

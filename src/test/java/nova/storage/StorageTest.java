@@ -28,13 +28,15 @@ class StorageTest {
         tasks.add(new Todo("read book"));
         tasks.add(new Deadline("submit report", LocalDate.of(2026, 8, 24)));
         tasks.add(new Event("meeting", "Monday 9am", "Monday 10am"));
+        tasks.addTag(1, "#reading");
+        tasks.addTag(1, "#urgent");
         tasks.markAsDone(1);
 
         storage.save(tasks);
         TaskList loadedTasks = storage.load();
 
         assertEquals(3, loadedTasks.size());
-        assertEquals("[T][X] read book", loadedTasks.get(0).toString());
+        assertEquals("[T][X] read book #reading #urgent", loadedTasks.get(0).toString());
         assertEquals("[D][ ] submit report (by: Aug 24 2026)", loadedTasks.get(1).toString());
         assertEquals("[E][ ] meeting (from: Monday 9am to: Monday 10am)",
                 loadedTasks.get(2).toString());
@@ -68,5 +70,23 @@ class StorageTest {
 
         assertEquals(1, loadedTasks.size());
         assertEquals("valid task", loadedTasks.get(0).getDescription());
+    }
+
+    /** Verifies that legacy records without tag fields remain loadable. */
+    @Test
+    void load_legacyRecordsWithoutTags_remainsBackwardCompatible() throws Exception {
+        Path taskFile = temporaryDirectory.resolve("legacy.txt");
+        Files.writeString(taskFile, String.join(System.lineSeparator(),
+                "T | 0 | todo",
+                "D | 0 | deadline | 2026-08-24",
+                "E | 0 | event | Monday 9am | Monday 10am"));
+        Storage storage = new Storage(taskFile);
+
+        TaskList loadedTasks = storage.load();
+
+        assertEquals(3, loadedTasks.size());
+        assertTrue(loadedTasks.get(0).getTags().isEmpty());
+        assertTrue(loadedTasks.get(1).getTags().isEmpty());
+        assertTrue(loadedTasks.get(2).getTags().isEmpty());
     }
 }

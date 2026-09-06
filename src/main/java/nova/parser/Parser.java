@@ -4,17 +4,23 @@ import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 
 import nova.exception.NovaException;
+import nova.task.Task;
 
 /** Interprets user input as a validated Nova command. */
 public class Parser {
     /** The command categories understood by Nova. */
     public enum CommandType {
-        EXIT, LIST, FIND, ON, MARK, UNMARK, DELETE, TODO, DEADLINE, EVENT
+        EXIT, LIST, FIND, ON, MARK, UNMARK, DELETE, TAG, UNTAG, TODO, DEADLINE, EVENT
     }
 
     /** The validated result of parsing one user command. */
     public record ParsedCommand(CommandType type, int taskNumber, String description,
-                                LocalDate date, String from, String to) {
+                                LocalDate date, String from, String to, String tag) {
+        /** Creates a command without a tag argument. */
+        public ParsedCommand(CommandType type, int taskNumber, String description, LocalDate date,
+                             String from, String to) {
+            this(type, taskNumber, description, date, from, to, "");
+        }
     }
 
     /** Parses one complete command and extracts its arguments. */
@@ -39,6 +45,12 @@ public class Parser {
         }
         if (isCommandWithOptionalArgument(command, "delete")) {
             return createTaskCommand(CommandType.DELETE, command, "delete");
+        }
+        if (isCommandWithOptionalArgument(command, "tag")) {
+            return parseTagCommand(CommandType.TAG, command, "tag");
+        }
+        if (isCommandWithOptionalArgument(command, "untag")) {
+            return parseTagCommand(CommandType.UNTAG, command, "untag");
         }
         if (isCommandWithOptionalArgument(command, "todo")) {
             return parseTodoCommand(command);
@@ -94,6 +106,25 @@ public class Parser {
         }
         return new ParsedCommand(CommandType.EVENT, 0, command.substring(6, fromIndex), null,
                 command.substring(fromIndex + 7, toIndex), command.substring(toIndex + 5));
+    }
+
+    /** Parses a tag or untag command and validates its task number and label. */
+    private static ParsedCommand parseTagCommand(CommandType type, String command, String commandWord)
+            throws NovaException {
+        String[] arguments = command.substring(commandWord.length()).trim().split("\\s+", -1);
+        if (arguments.length != 2) {
+            throw new NovaException("Please use: " + commandWord + " INDEX #label.");
+        }
+        int taskNumber;
+        try {
+            taskNumber = Integer.parseInt(arguments[0]);
+        } catch (NumberFormatException exception) {
+            throw new NovaException("Please provide a valid task number.");
+        }
+        if (!Task.isValidTag(arguments[1])) {
+            throw new NovaException("Please provide a valid tag in the format #label.");
+        }
+        return new ParsedCommand(type, taskNumber, "", null, "", "", arguments[1]);
     }
 
     /** Creates a parsed command whose only argument is a task number. */

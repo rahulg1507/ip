@@ -34,7 +34,7 @@ public class Event extends Task {
      */
     @Override
     public String toStorageString() {
-        return super.toStorageString() + " | " + from + " | " + to;
+        return getBaseStorageString() + " | " + from + " | " + to + getTagsStorageSuffix();
     }
 
     /**
@@ -44,6 +44,6 @@ public class Event extends Task {
      */
     @Override
     public String toString() {
-        return super.toString() + " (from: " + from + " to: " + to + ")";
+        return super.toString();
     }
 }

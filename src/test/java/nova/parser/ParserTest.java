@@ -47,6 +47,19 @@ class ParserTest {
         assertEquals(1, delete.taskNumber());
     }
 
+    /** Verifies that tag commands extract their task number and label. */
+    @Test
+    void parse_tagCommands_extractTaskNumberAndLabel() throws NovaException {
+        Parser.ParsedCommand tag = parser.parse("tag 2 #urgent");
+        Parser.ParsedCommand untag = parser.parse("untag 2 #urgent");
+
+        assertEquals(Parser.CommandType.TAG, tag.type());
+        assertEquals(2, tag.taskNumber());
+        assertEquals("#urgent", tag.tag());
+        assertEquals(Parser.CommandType.UNTAG, untag.type());
+        assertEquals("#urgent", untag.tag());
+    }
+
     /** Verifies that zero and negative task numbers are parsed as integers. */
     @Test
     void parse_taskNumberCommands_acceptsZeroAndNegativeNumbers() throws NovaException {
@@ -67,6 +80,14 @@ class ParserTest {
         assertEquals("Please provide a valid task number.", markException.getMessage());
         assertEquals("Please provide a valid task number.", unmarkException.getMessage());
         assertEquals("Please provide a valid task number.", deleteException.getMessage());
+    }
+
+    /** Verifies that malformed tag labels produce a clear error. */
+    @Test
+    void parse_malformedTagLabel_throwsClearError() {
+        NovaException exception = assertThrows(NovaException.class, () -> parser.parse("tag 1 urgent"));
+
+        assertEquals("Please provide a valid tag in the format #label.", exception.getMessage());
     }
 
     /** Verifies that todo descriptions are trimmed during parsing. */
