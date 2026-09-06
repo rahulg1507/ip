@@ -63,16 +63,21 @@ public class TaskList implements Iterable<Task> {
 
     /** Returns deadlines and events that occur on the requested date. */
     public ArrayList<Task> getTasksOnDate(LocalDate date) {
+        String dateText = date.toString();
         ArrayList<Task> matchingTasks = new ArrayList<>();
         for (Task task : tasks) {
             if (task instanceof Deadline deadline && deadline.by.equals(date)) {
                 matchingTasks.add(task);
-            } else if (task instanceof Event event
-                    && (event.from.contains(date.toString()) || event.to.contains(date.toString()))) {
+            } else if (task instanceof Event event && isEventOnDate(event, dateText)) {
                 matchingTasks.add(task);
             }
         }
         return matchingTasks;
+    }
+
+    /** Returns whether an event starts or ends on the requested date. */
+    private static boolean isEventOnDate(Event event, String dateText) {
+        return event.from.contains(dateText) || event.to.contains(dateText);
     }
 
     /** Returns tasks whose descriptions contain the keyword, ignoring letter case. */
