@@ -43,35 +43,20 @@ public class CommandHandler {
                 int taskNumber = command.taskNumber();
                 Task task = tasks.getByNumber(taskNumber);
                 tasks.markAsDone(taskNumber);
-                try {
-                    storage.save(tasks);
-                } catch (NovaException exception) {
-                    tasks.markAsNotDone(taskNumber);
-                    throw exception;
-                }
+                saveOrRollback(task::markAsNotDone);
                 ui.showMarkedDone(task);
             }
             case UNMARK -> {
                 int taskNumber = command.taskNumber();
                 Task task = tasks.getByNumber(taskNumber);
                 tasks.markAsNotDone(taskNumber);
-                try {
-                    storage.save(tasks);
-                } catch (NovaException exception) {
-                    tasks.markAsDone(taskNumber);
-                    throw exception;
-                }
+                saveOrRollback(task::markAsDone);
                 ui.showMarkedNotDone(task);
             }
             case DELETE -> {
                 int taskNumber = command.taskNumber();
                 Task deletedTask = tasks.removeByNumber(taskNumber);
-                try {
-                    storage.save(tasks);
-                } catch (NovaException exception) {
-                    tasks.add(taskNumber - 1, deletedTask);
-                    throw exception;
-                }
+                saveOrRollback(() -> tasks.add(taskNumber - 1, deletedTask));
                 ui.showDeleted(deletedTask, tasks.size());
             }
             case TODO -> addAndShow(new Todo(command.description()));
@@ -80,6 +65,16 @@ public class CommandHandler {
             default -> throw new NovaException("Unsupported command.");
         }
         return false;
+    }
+
+    /** Saves the current task state and applies the rollback if saving fails. */
+    private void saveOrRollback(Runnable rollback) throws NovaException {
+        try {
+            storage.save(tasks);
+        } catch (NovaException exception) {
+            rollback.run();
+            throw exception;
+        }
     }
 
     /** Adds a task, persists it, and reports the successful addition. */
