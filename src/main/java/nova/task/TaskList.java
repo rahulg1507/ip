@@ -59,7 +59,10 @@ public class TaskList implements Iterable<Task> {
     /** Removes and returns the task at a one-based user-facing position. */
     public Task removeByNumber(int taskNumber) throws NovaException {
         getByNumber(taskNumber);
-        return tasks.remove(taskNumber - 1);
+        int taskIndex = taskNumber - 1;
+        assert taskIndex >= 0 && taskIndex < tasks.size()
+                : "Validated task number should map to an in-bounds task index";
+        return tasks.remove(taskIndex);
     }
 
     /** Returns deadlines and events that occur on the requested date. */
