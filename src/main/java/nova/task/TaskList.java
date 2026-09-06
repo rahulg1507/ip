@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Locale;
+import java.util.stream.Collectors;
 
 import nova.exception.NovaException;
 
@@ -86,13 +87,9 @@ public class TaskList implements Iterable<Task> {
     /** Returns tasks whose descriptions contain the keyword, ignoring letter case. */
     public ArrayList<Task> findByKeyword(String keyword) {
         String normalizedKeyword = keyword.toLowerCase(Locale.ROOT);
-        ArrayList<Task> matchingTasks = new ArrayList<>();
-        for (Task task : tasks) {
-            if (task.getDescription().toLowerCase(Locale.ROOT).contains(normalizedKeyword)) {
-                matchingTasks.add(task);
-            }
-        }
-        return matchingTasks;
+        return tasks.stream()
+                .filter(task -> task.getDescription().toLowerCase(Locale.ROOT).contains(normalizedKeyword))
+                .collect(Collectors.toCollection(ArrayList::new));
     }
 
     /** Allows callers to process every task without owning the collection. */
