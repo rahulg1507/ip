@@ -1,9 +1,11 @@
 package nova.parser;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeParseException;
 
 import nova.exception.NovaException;
+import nova.task.Event;
 import nova.task.Task;
 
 /** Interprets user input as a validated Nova command. */
@@ -25,6 +27,9 @@ public class Parser {
 
     /** Parses one complete command and extracts its arguments. */
     public ParsedCommand parse(String command) throws NovaException {
+        if (command == null) {
+            throw new NovaException("Please enter a command.");
+        }
         if (command.equals("bye")) {
             return new ParsedCommand(CommandType.EXIT, 0, "", null, "", "");
         }
@@ -84,6 +89,7 @@ public class Parser {
         if (description.isEmpty()) {
             throw new NovaException("Please add a description after 'todo'.");
         }
+        rejectStorageDelimiter(description, "task descriptions");
         return new ParsedCommand(CommandType.TODO, 0, description, null, "", "");
     }
 
@@ -93,7 +99,9 @@ public class Parser {
         if (byIndex <= 9 || byIndex + 5 >= command.length()) {
             throw new NovaException("Please use: deadline DESCRIPTION /by DATE.");
         }
-        return new ParsedCommand(CommandType.DEADLINE, 0, command.substring(9, byIndex),
+        String description = command.substring(9, byIndex);
+        rejectStorageDelimiter(description, "task descriptions");
+        return new ParsedCommand(CommandType.DEADLINE, 0, description,
                 parseDate(command.substring(byIndex + 5)), "", "");
     }
 
@@ -104,8 +112,14 @@ public class Parser {
         if (fromIndex <= 6 || toIndex <= fromIndex + 7 || toIndex + 5 >= command.length()) {
             throw new NovaException("Please use: event DESCRIPTION /from START /to END.");
         }
-        return new ParsedCommand(CommandType.EVENT, 0, command.substring(6, fromIndex), null,
-                command.substring(fromIndex + 7, toIndex), command.substring(toIndex + 5));
+        String description = command.substring(6, fromIndex);
+        String from = command.substring(fromIndex + 7, toIndex);
+        String to = command.substring(toIndex + 5);
+        rejectStorageDelimiter(description, "task descriptions");
+        rejectStorageDelimiter(from, "event date-times");
+        rejectStorageDelimiter(to, "event date-times");
+        validateEventDateTimeRange(from, to);
+        return new ParsedCommand(CommandType.EVENT, 0, description, null, from, to);
     }
 
     /** Parses a tag or untag command and validates its task number and label. */
@@ -125,6 +139,28 @@ public class Parser {
             throw new NovaException("Please provide a valid tag in the format #label.");
         }
         return new ParsedCommand(type, taskNumber, "", null, "", "", arguments[1]);
+    }
+
+    /** Verifies that an event uses real date-times in chronological order. */
+    private static void validateEventDateTimeRange(String from, String to) throws NovaException {
+        LocalDateTime start;
+        LocalDateTime end;
+        try {
+            start = Event.parseDateTime(from);
+            end = Event.parseDateTime(to);
+        } catch (DateTimeParseException exception) {
+            throw new NovaException("Please use event date-times in yyyy-MM-dd HH:mm format.");
+        }
+        if (!start.isBefore(end)) {
+            throw new NovaException("Event start must be before its end.");
+        }
+    }
+
+    /** Rejects characters that would be interpreted as storage separators. */
+    private static void rejectStorageDelimiter(String value, String valueDescription) throws NovaException {
+        if (value.contains("|")) {
+            throw new NovaException("The character '|' is not allowed in " + valueDescription + ".");
+        }
     }
 
     /** Creates a parsed command whose only argument is a task number. */

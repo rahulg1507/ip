@@ -23,6 +23,14 @@ class ParserTest {
         assertEquals(Parser.CommandType.LIST, list.type());
     }
 
+    /** Verifies that null input produces a Nova error instead of a runtime exception. */
+    @Test
+    void parse_nullCommand_throwsClearError() {
+        NovaException exception = assertThrows(NovaException.class, () -> parser.parse(null));
+
+        assertEquals("Please enter a command.", exception.getMessage());
+    }
+
     /** Verifies that find commands extract a trimmed keyword. */
     @Test
     void parse_findCommand_extractsKeyword() throws NovaException {
@@ -90,6 +98,14 @@ class ParserTest {
         assertEquals("Please provide a valid tag in the format #label.", exception.getMessage());
     }
 
+    /** Verifies that the storage delimiter is rejected in tag labels. */
+    @Test
+    void parse_tagWithStorageDelimiter_throwsClearError() {
+        NovaException exception = assertThrows(NovaException.class, () -> parser.parse("tag 1 #fun|urgent"));
+
+        assertEquals("Please provide a valid tag in the format #label.", exception.getMessage());
+    }
+
     /** Verifies that todo descriptions are trimmed during parsing. */
     @Test
     void parse_todoCommand_trimsDescription() throws NovaException {
@@ -97,6 +113,14 @@ class ParserTest {
 
         assertEquals(Parser.CommandType.TODO, result.type());
         assertEquals("buy milk", result.description());
+    }
+
+    /** Verifies that the storage delimiter is rejected in task descriptions. */
+    @Test
+    void parse_taskDescriptionWithStorageDelimiter_throwsClearError() {
+        NovaException exception = assertThrows(NovaException.class, () -> parser.parse("todo buy | milk"));
+
+        assertEquals("The character '|' is not allowed in task descriptions.", exception.getMessage());
     }
 
     /** Verifies that deadline descriptions and ISO dates are parsed. */
@@ -113,12 +137,33 @@ class ParserTest {
     @Test
     void parse_eventCommand_extractsDescriptionAndTimeRange() throws NovaException {
         Parser.ParsedCommand result = parser.parse(
-                "event project meeting /from Monday 9am /to Monday 10am");
+                "event project meeting /from 2026-08-24 09:00 /to 2026-08-24 10:00");
 
         assertEquals(Parser.CommandType.EVENT, result.type());
         assertEquals("project meeting", result.description());
-        assertEquals("Monday 9am", result.from());
-        assertEquals("Monday 10am", result.to());
+        assertEquals("2026-08-24 09:00", result.from());
+        assertEquals("2026-08-24 10:00", result.to());
+    }
+
+    /** Verifies that nonexistent event dates are rejected. */
+    @Test
+    void parse_eventWithInvalidDate_throwsClearError() {
+        String invalidEvent = "event meeting /from 2026-02-30 09:00 /to 2026-03-01 10:00";
+        NovaException exception = assertThrows(NovaException.class, () -> parser.parse(invalidEvent));
+
+        assertEquals("Please use event date-times in yyyy-MM-dd HH:mm format.", exception.getMessage());
+    }
+
+    /** Verifies that equal or reversed event ranges are rejected. */
+    @Test
+    void parse_eventWithNonChronologicalRange_throwsClearError() {
+        String equalEvent = "event meeting /from 2026-08-24 09:00 /to 2026-08-24 09:00";
+        String reversedEvent = "event meeting /from 2026-08-24 10:00 /to 2026-08-24 09:00";
+        NovaException equalException = assertThrows(NovaException.class, () -> parser.parse(equalEvent));
+        NovaException reversedException = assertThrows(NovaException.class, () -> parser.parse(reversedEvent));
+
+        assertEquals("Event start must be before its end.", equalException.getMessage());
+        assertEquals("Event start must be before its end.", reversedException.getMessage());
     }
 
     /** Verifies that date-filter commands parse ISO dates. */

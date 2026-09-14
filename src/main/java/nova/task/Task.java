@@ -91,12 +91,15 @@ public class Task {
 
     /** Adds a tag to this task, ignoring the request if the tag is already present. */
     public boolean addTag(String tag) {
+        if (!isValidTag(tag)) {
+            return false;
+        }
         return tags.add(tag);
     }
 
     /** Returns whether a tag starts with a hash and contains no whitespace. */
     public static boolean isValidTag(String tag) {
-        return tag != null && tag.matches("#\\S+");
+        return tag != null && tag.matches("#[^|\\s]+");
     }
 
     /** Removes a tag from this task and reports whether it was present. */

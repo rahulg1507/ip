@@ -18,6 +18,40 @@ Expected output:
     Bye. Hope to see you again soon!
     ____________________________________________________________
 
+## Reject invalid event data
+Aim: Verify that nonexistent, equal, and reversed event date-times and storage delimiters are rejected.
+Inputs:
+    event invalid date /from 2026-02-30 09:00 /to 2026-03-01 10:00
+    event reversed /from 2026-08-24 10:00 /to 2026-08-24 09:00
+    event equal /from 2026-08-24 09:00 /to 2026-08-24 09:00
+    todo buy | milk
+    bye
+Expected output:
+    ____________________________________________________________
+     _   _    ___    _   _    _
+    | \ | |  / _ \  | | | |  / \
+    |  \| | | | | | | | | | / _ \
+    | |\  | | |_| |  \ V / / ___ \
+    |_| \_|  \___/    \_/ /_/   \_\
+    Hello! I'm Nova.
+    What can I do for you?
+    ____________________________________________________________
+    ____________________________________________________________
+     Please use event date-times in yyyy-MM-dd HH:mm format.
+    ____________________________________________________________
+    ____________________________________________________________
+     Event start must be before its end.
+    ____________________________________________________________
+    ____________________________________________________________
+     Event start must be before its end.
+    ____________________________________________________________
+    ____________________________________________________________
+     The character '|' is not allowed in task descriptions.
+    ____________________________________________________________
+    ____________________________________________________________
+    Bye. Hope to see you again soon!
+    ____________________________________________________________
+
 ## Tag and untag tasks
 Aim: Verify that tasks accept tags, ignore duplicate tags, remove existing tags, and reject malformed or missing tags.
 Inputs:
@@ -349,7 +383,7 @@ Aim: Verify that deleting a middle task keeps the remaining task order and posit
 Inputs:
     todo read book
     deadline submit assignment /by 2020-01-01
-    event project meeting /from Monday 2pm /to 4pm
+    event project meeting /from 2026-08-24 14:00 /to 2026-08-24 16:00
     delete 2
     mark 2
     list
@@ -376,7 +410,7 @@ Expected output:
     ____________________________________________________________
     ____________________________________________________________
      Got it. I've added this task:
-      [E][ ] project meeting (from: Monday 2pm to: 4pm)
+      [E][ ] project meeting (from: 2026-08-24 14:00 to: 2026-08-24 16:00)
      Now you have 3 tasks in the list.
     ____________________________________________________________
     ____________________________________________________________
@@ -386,12 +420,12 @@ Expected output:
     ____________________________________________________________
     ____________________________________________________________
      Nice! I've marked this task as done:
-       [E][X] project meeting (from: Monday 2pm to: 4pm)
+       [E][X] project meeting (from: 2026-08-24 14:00 to: 2026-08-24 16:00)
     ____________________________________________________________
     ____________________________________________________________
      Here are the tasks in your list:
      1.[T][ ] read book
-     2.[E][X] project meeting (from: Monday 2pm to: 4pm)
+     2.[E][X] project meeting (from: 2026-08-24 14:00 to: 2026-08-24 16:00)
     ____________________________________________________________
     ____________________________________________________________
     Bye. Hope to see you again soon!
@@ -470,10 +504,10 @@ Expected output:
     ____________________________________________________________
 
 ## Add and list event tasks
-Aim: Verify that event tasks preserve their plain-text start and end values and display the E prefix.
+Aim: Verify that event tasks accept valid date-time ranges and display the E prefix.
 Inputs:
-    event project meeting /from Mon 2pm /to 4pm
-    event workshop /from Friday 9am /to Friday 11am
+    event project meeting /from 2026-08-24 14:00 /to 2026-08-24 16:00
+    event workshop /from 2026-08-25 09:00 /to 2026-08-25 11:00
     list
     bye
 Expected output:
@@ -488,18 +522,18 @@ Expected output:
     ____________________________________________________________
     ____________________________________________________________
      Got it. I've added this task:
-      [E][ ] project meeting (from: Mon 2pm to: 4pm)
+      [E][ ] project meeting (from: 2026-08-24 14:00 to: 2026-08-24 16:00)
      Now you have 1 tasks in the list.
     ____________________________________________________________
     ____________________________________________________________
      Got it. I've added this task:
-      [E][ ] workshop (from: Friday 9am to: Friday 11am)
+      [E][ ] workshop (from: 2026-08-25 09:00 to: 2026-08-25 11:00)
      Now you have 2 tasks in the list.
     ____________________________________________________________
     ____________________________________________________________
      Here are the tasks in your list:
-     1.[E][ ] project meeting (from: Mon 2pm to: 4pm)
-     2.[E][ ] workshop (from: Friday 9am to: Friday 11am)
+     1.[E][ ] project meeting (from: 2026-08-24 14:00 to: 2026-08-24 16:00)
+     2.[E][ ] workshop (from: 2026-08-25 09:00 to: 2026-08-25 11:00)
     ____________________________________________________________
     ____________________________________________________________
     Bye. Hope to see you again soon!

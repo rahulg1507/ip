@@ -58,7 +58,10 @@ public class Storage {
     public void save(TaskList tasks) throws NovaException {
         Path temporaryFile = taskFile.resolveSibling(taskFile.getFileName() + ".tmp");
         try {
-            Files.createDirectories(taskFile.getParent());
+            Path parentDirectory = taskFile.getParent();
+            if (parentDirectory != null) {
+                Files.createDirectories(parentDirectory);
+            }
             ArrayList<String> lines = new ArrayList<>();
             for (Task task : tasks) {
                 lines.add(task.toStorageString());
@@ -107,7 +110,14 @@ public class Storage {
             tagsIndex = parts.length == 5 ? 4 : -1;
         } else if ("E".equals(parts[0]) && (parts.length == 5 || parts.length == 6)
                 && !parts[3].isBlank() && !parts[4].isBlank()) {
-            task = new Event(description, parts[3], parts[4]);
+            if (!Event.isValidDateTimeRange(parts[3], parts[4])) {
+                return false;
+            }
+            try {
+                task = new Event(description, parts[3], parts[4]);
+            } catch (NovaException exception) {
+                return false;
+            }
             tagsIndex = parts.length == 6 ? 5 : -1;
         } else if ("B".equals(parts[0]) && (parts.length == 3 || parts.length == 4)) {
             task = new Task(description);

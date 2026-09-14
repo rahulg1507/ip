@@ -27,7 +27,7 @@ class StorageTest {
         TaskList tasks = new TaskList();
         tasks.add(new Todo("read book"));
         tasks.add(new Deadline("submit report", LocalDate.of(2026, 8, 24)));
-        tasks.add(new Event("meeting", "Monday 9am", "Monday 10am"));
+        tasks.add(new Event("meeting", "2026-08-24 09:00", "2026-08-24 10:00"));
         tasks.addTag(1, "#reading");
         tasks.addTag(1, "#urgent");
         tasks.markAsDone(1);
@@ -38,7 +38,7 @@ class StorageTest {
         assertEquals(3, loadedTasks.size());
         assertEquals("[T][X] read book #reading #urgent", loadedTasks.get(0).toString());
         assertEquals("[D][ ] submit report (by: Aug 24 2026)", loadedTasks.get(1).toString());
-        assertEquals("[E][ ] meeting (from: Monday 9am to: Monday 10am)",
+        assertEquals("[E][ ] meeting (from: 2026-08-24 09:00 to: 2026-08-24 10:00)",
                 loadedTasks.get(2).toString());
     }
 
@@ -63,6 +63,7 @@ class StorageTest {
         Files.writeString(taskFile, String.join(System.lineSeparator(),
                 "T | 0 | valid task",
                 "D | 0 | invalid date | 2026-02-30",
+                "E | 0 | invalid range | 2026-08-24 10:00 | 2026-08-24 09:00",
                 "not a task record"));
         Storage storage = new Storage(taskFile);
 
@@ -79,7 +80,7 @@ class StorageTest {
         Files.writeString(taskFile, String.join(System.lineSeparator(),
                 "T | 0 | todo",
                 "D | 0 | deadline | 2026-08-24",
-                "E | 0 | event | Monday 9am | Monday 10am"));
+                "E | 0 | event | 2026-08-24 09:00 | 2026-08-24 10:00"));
         Storage storage = new Storage(taskFile);
 
         TaskList loadedTasks = storage.load();
@@ -88,5 +89,23 @@ class StorageTest {
         assertTrue(loadedTasks.get(0).getTags().isEmpty());
         assertTrue(loadedTasks.get(1).getTags().isEmpty());
         assertTrue(loadedTasks.get(2).getTags().isEmpty());
+    }
+
+    /** Verifies that a relative task filename without a parent directory can be saved. */
+    @Test
+    void save_relativeFilenameWithoutParent_succeeds() throws Exception {
+        Path taskFile = Path.of("nova-relative-test.txt");
+        Storage storage = new Storage(taskFile);
+        TaskList tasks = new TaskList();
+        tasks.add(new Todo("relative task"));
+
+        try {
+            storage.save(tasks);
+
+            assertEquals("T | 0 | relative task", Files.readString(taskFile).trim());
+        } finally {
+            Files.deleteIfExists(taskFile);
+            Files.deleteIfExists(Path.of("nova-relative-test.txt.tmp"));
+        }
     }
 }

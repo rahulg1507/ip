@@ -126,12 +126,12 @@ class TaskListTest {
 
     /** Verifies that date filtering returns matching deadlines and events only. */
     @Test
-    void getTasksOnDate_returnsMatchingDeadlinesAndEvents_only() {
+    void getTasksOnDate_returnsMatchingDeadlinesAndEvents_only() throws NovaException {
         LocalDate targetDate = LocalDate.of(2026, 8, 24);
         TaskList tasks = new TaskList();
         tasks.add(new Todo("ordinary task"));
         tasks.add(new Deadline("deadline", targetDate));
-        tasks.add(new Event("event", "2026-08-24 9am", "2026-08-24 10am"));
+        tasks.add(new Event("event", "2026-08-24 09:00", "2026-08-24 10:00"));
         tasks.add(new Deadline("different date", targetDate.plusDays(1)));
 
         ArrayList<Task> matchingTasks = tasks.getTasksOnDate(targetDate);
@@ -142,13 +142,24 @@ class TaskListTest {
         assertTrue(matchingTasks.stream().noneMatch(task -> task instanceof Todo));
     }
 
+    /** Verifies that invalid event date-time ranges are rejected by the event model. */
+    @Test
+    void event_invalidDateTimeRange_throwsClearError() {
+        String reversedEvent = "2026-08-24 10:00";
+        String eventEnd = "2026-08-24 09:00";
+        NovaException exception = assertThrows(NovaException.class, () -> new Event("event", reversedEvent, eventEnd));
+
+        assertEquals("Event start and end must be valid, and start must be before end.",
+                exception.getMessage());
+    }
+
     /** Verifies that find matches description substrings without case sensitivity. */
     @Test
-    void find_keywordMatchesDescriptionsCaseInsensitively() {
+    void find_keywordMatchesDescriptionsCaseInsensitively() throws NovaException {
         TaskList tasks = new TaskList();
         tasks.add(new Todo("Read a book"));
         tasks.add(new Deadline("Return BOOK", LocalDate.of(2026, 8, 24)));
-        tasks.add(new Event("Attend meeting", "Monday 9am", "Monday 10am"));
+        tasks.add(new Event("Attend meeting", "2026-08-24 09:00", "2026-08-24 10:00"));
 
         ArrayList<Task> matchingTasks = tasks.findByKeyword("book");
 

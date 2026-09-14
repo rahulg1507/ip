@@ -1,7 +1,18 @@
 package nova.task;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+import java.time.format.ResolverStyle;
+
+import nova.exception.NovaException;
+
 /** Represents an event with plain-text start and end date/time values. */
 public class Event extends Task {
+    /** The format used for event start and end date-times. */
+    private static final DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("uuuu-MM-dd HH:mm")
+            .withResolverStyle(ResolverStyle.STRICT);
+
     /** The plain-text event start date and time. */
     protected String from;
 
@@ -15,10 +26,27 @@ public class Event extends Task {
      * @param from the plain-text start date and time
      * @param to the plain-text end date and time
      */
-    public Event(String description, String from, String to) {
+    public Event(String description, String from, String to) throws NovaException {
         super(description, TaskType.EVENT);
+        if (!isValidDateTimeRange(from, to)) {
+            throw new NovaException("Event start and end must be valid, and start must be before end.");
+        }
         this.from = from;
         this.to = to;
+    }
+
+    /** Parses an event date-time in the supported format. */
+    public static LocalDateTime parseDateTime(String value) {
+        return LocalDateTime.parse(value, DATE_TIME_FORMAT);
+    }
+
+    /** Returns whether two event date-times are valid and strictly chronological. */
+    public static boolean isValidDateTimeRange(String from, String to) {
+        try {
+            return parseDateTime(from).isBefore(parseDateTime(to));
+        } catch (DateTimeParseException exception) {
+            return false;
+        }
     }
 
     /** Returns the event description with its time-range suffix. */
