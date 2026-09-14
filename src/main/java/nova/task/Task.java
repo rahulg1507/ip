@@ -89,6 +89,19 @@ public class Task {
         return status.getDisplayIcon();
     }
 
+    /**
+     * Returns whether this task has the same identity as another task.
+     *
+     * <p>Task identity includes the task type and description, but ignores completion status and
+     * tags so those mutable properties do not permit duplicate tasks.</p>
+     *
+     * @param other the task to compare with this task
+     * @return true if both tasks have the same base identity
+     */
+    public boolean hasSameIdentity(Task other) {
+        return other != null && taskType == other.taskType && description.equals(other.description);
+    }
+
     /** Adds a tag to this task, ignoring the request if the tag is already present. */
     public boolean addTag(String tag) {
         if (!isValidTag(tag)) {

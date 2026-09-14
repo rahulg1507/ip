@@ -26,6 +26,64 @@ class TaskListTest {
         assertEquals("second", tasks.get(1).getDescription());
     }
 
+    /** Verifies that adding a duplicate todo is rejected with a clear error. */
+    @Test
+    void addIfNotDuplicate_duplicateTodo_throwsClearError() throws NovaException {
+        TaskList tasks = new TaskList();
+        tasks.addIfNotDuplicate(new Todo("read book"));
+        Todo duplicateTask = new Todo("read book");
+
+        NovaException exception = assertThrows(NovaException.class, () -> tasks.addIfNotDuplicate(duplicateTask));
+
+        assertEquals("A task with the same details already exists.", exception.getMessage());
+        assertEquals(1, tasks.size());
+    }
+
+    /** Verifies that a deadline with the same description and date is rejected. */
+    @Test
+    void addIfNotDuplicate_duplicateDeadline_throwsClearError() throws NovaException {
+        TaskList tasks = new TaskList();
+        LocalDate deadlineDate = LocalDate.of(2026, 8, 24);
+        tasks.addIfNotDuplicate(new Deadline("submit report", deadlineDate));
+
+        NovaException exception = assertThrows(NovaException.class, () -> tasks.addIfNotDuplicate(
+                new Deadline("submit report", deadlineDate)));
+
+        assertEquals("A task with the same details already exists.", exception.getMessage());
+        assertEquals(1, tasks.size());
+    }
+
+    /** Verifies that an event with the same description and date-time range is rejected. */
+    @Test
+    void addIfNotDuplicate_duplicateEvent_throwsClearError() throws NovaException {
+        TaskList tasks = new TaskList();
+        String eventStart = "2026-08-24 09:00";
+        String eventEnd = "2026-08-24 10:00";
+        tasks.addIfNotDuplicate(new Event("meeting", eventStart, eventEnd));
+
+        NovaException exception = assertThrows(NovaException.class, () -> tasks.addIfNotDuplicate(
+                new Event("meeting", eventStart, eventEnd)));
+
+        assertEquals("A task with the same details already exists.", exception.getMessage());
+        assertEquals(1, tasks.size());
+    }
+
+    /** Verifies that completion status and tags do not change task identity. */
+    @Test
+    void addIfNotDuplicate_differentStatusAndTags_stillThrowsDuplicateError() throws NovaException {
+        TaskList tasks = new TaskList();
+        Todo existingTask = new Todo("read book");
+        tasks.addIfNotDuplicate(existingTask);
+        existingTask.markAsDone();
+        existingTask.addTag("#reading");
+        Todo duplicateTask = new Todo("read book");
+
+        NovaException exception = assertThrows(NovaException.class, () -> tasks.addIfNotDuplicate(duplicateTask));
+
+        assertEquals("A task with the same details already exists.", exception.getMessage());
+        assertEquals(1, tasks.size());
+    }
+
     /** Verifies that a valid user-facing task number returns the task. */
     @Test
     void getByNumber_validNumberReturnsTask_zeroBasedCollectionRemainsHidden() throws NovaException {

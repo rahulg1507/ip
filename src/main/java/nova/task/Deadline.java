@@ -28,6 +28,12 @@ public class Deadline extends Task {
         return description + " (by: " + by.format(DISPLAY_FORMAT) + ")";
     }
 
+    /** Returns whether another task has the same type, description, and deadline date. */
+    @Override
+    public boolean hasSameIdentity(Task other) {
+        return super.hasSameIdentity(other) && other instanceof Deadline deadline && by.equals(deadline.by);
+    }
+
     /**
      * Returns this deadline in the format used for persistent storage.
      *

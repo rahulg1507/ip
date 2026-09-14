@@ -23,6 +23,15 @@ public class TaskList implements Iterable<Task> {
         tasks.add(index, task);
     }
 
+    /** Adds a task unless a task with the same identity is already present. */
+    public void addIfNotDuplicate(Task task) throws NovaException {
+        boolean isDuplicate = tasks.stream().anyMatch(existingTask -> existingTask.hasSameIdentity(task));
+        if (isDuplicate) {
+            throw new NovaException("A task with the same details already exists.");
+        }
+        tasks.add(task);
+    }
+
     /** Removes and returns the task at the specified zero-based position. */
     public Task remove(int index) {
         return tasks.remove(index);

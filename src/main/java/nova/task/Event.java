@@ -49,6 +49,13 @@ public class Event extends Task {
         }
     }
 
+    /** Returns whether another task has the same type, description, and event date-time range. */
+    @Override
+    public boolean hasSameIdentity(Task other) {
+        return super.hasSameIdentity(other) && other instanceof Event event
+                && from.equals(event.from) && to.equals(event.to);
+    }
+
     /** Returns the event description with its time-range suffix. */
     @Override
     public String getDisplayDescription() {

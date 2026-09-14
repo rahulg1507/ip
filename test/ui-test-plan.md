@@ -18,6 +18,34 @@ Expected output:
     Bye. Hope to see you again soon!
     ____________________________________________________________
 
+## Reject duplicate tasks
+Aim: Verify that adding a task with the same type and details is rejected.
+Inputs:
+    todo read book
+    todo read book
+    bye
+Expected output:
+    ____________________________________________________________
+     _   _    ___    _   _    _
+    | \ | |  / _ \  | | | |  / \
+    |  \| | | | | | | | | | / _ \
+    | |\  | | |_| |  \ V / / ___ \
+    |_| \_|  \___/    \_/ /_/   \_\
+    Hello! I'm Nova.
+    What can I do for you?
+    ____________________________________________________________
+    ____________________________________________________________
+     Got it. I've added this task:
+      [T][ ] read book
+     Now you have 1 tasks in the list.
+    ____________________________________________________________
+    ____________________________________________________________
+     A task with the same details already exists.
+    ____________________________________________________________
+    ____________________________________________________________
+    Bye. Hope to see you again soon!
+    ____________________________________________________________
+
 ## Reject invalid event data
 Aim: Verify that nonexistent, equal, and reversed event date-times and storage delimiters are rejected.
 Inputs:

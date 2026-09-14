@@ -104,7 +104,7 @@ public class CommandHandler {
 
     /** Adds a task, persists it, and reports the successful addition. */
     private void addAndShow(Task task) throws NovaException {
-        tasks.add(task);
+        tasks.addIfNotDuplicate(task);
         assert tasks.size() > 0 && tasks.get(tasks.size() - 1) == task
                 : "Added task should be present at the end of the task list";
         try {
