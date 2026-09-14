@@ -4,7 +4,7 @@ Nova is a friendly chatbot for managing todos, deadlines, events, and tags.
 
 ## Quick Start
 
-1. Download the latest `nova.jar` from the project's GitHub release.
+1. Download the latest [`nova.jar`](https://github.com/rahulg1507/ip/releases) from the project's GitHub releases.
 2. Make sure [JDK 25](https://www.oracle.com/java/technologies/downloads/) is installed.
 3. Open a terminal in the folder containing the JAR and run:
 
