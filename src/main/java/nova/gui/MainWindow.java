@@ -5,6 +5,7 @@ import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
 
 import javafx.application.Platform;
+import javafx.beans.binding.Bindings;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ScrollPane;
@@ -48,10 +49,13 @@ public class MainWindow extends AnchorPane {
         this.commandHandler = new CommandHandler(storage, tasks, ui);
     }
 
-    /** Binds the dialog container to the scroll pane's vertical position. */
+    /** Binds the dialog container to the scroll pane's position and available width. */
     @FXML
     public void initialize() {
         scrollPane.vvalueProperty().bind(dialogContainer.heightProperty());
+        dialogContainer.prefWidthProperty().bind(
+                Bindings.createDoubleBinding(() -> scrollPane.getViewportBounds().getWidth(),
+                        scrollPane.viewportBoundsProperty()));
     }
 
     /** Parses and executes the entered command, then displays Nova's real response. */
@@ -60,18 +64,20 @@ public class MainWindow extends AnchorPane {
         String input = userInput.getText();
         responseBuffer.reset();
         boolean shouldExit = false;
+        boolean isError = false;
 
         try {
             Parser.ParsedCommand command = parser.parse(input);
             shouldExit = commandHandler.execute(command);
         } catch (NovaException exception) {
             ui.showError(exception);
+            isError = true;
         }
 
         String response = responseBuffer.toString(StandardCharsets.UTF_8).strip();
         dialogContainer.getChildren().addAll(
                 DialogBox.getUserDialog(input, userImage),
-                DialogBox.getNovaDialog(response, novaImage));
+                DialogBox.getNovaDialog(response, novaImage, isError));
         userInput.clear();
 
         if (shouldExit) {
