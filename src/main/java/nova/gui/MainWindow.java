@@ -40,7 +40,7 @@ public class MainWindow extends AnchorPane {
     private final ByteArrayOutputStream responseBuffer = new ByteArrayOutputStream();
     private final PrintStream responseStream = new PrintStream(responseBuffer, true, StandardCharsets.UTF_8);
     private final Image userImage = new Image(this.getClass().getResourceAsStream("/images/DaUser.png"));
-    private final Image novaImage = new Image(this.getClass().getResourceAsStream("/images/DaDuke.png"));
+    private final Image novaImage = new Image(this.getClass().getResourceAsStream("/images/DaNova.png"));
 
     /** Binds the GUI controller to Nova's parser, command handler, storage, and task list. */
     public void bindNovaComponents(Storage storage, TaskList tasks, Parser parser) {
