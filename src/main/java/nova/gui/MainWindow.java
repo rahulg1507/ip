@@ -56,6 +56,17 @@ public class MainWindow extends AnchorPane {
         dialogContainer.prefWidthProperty().bind(
                 Bindings.createDoubleBinding(() -> scrollPane.getViewportBounds().getWidth(),
                         scrollPane.viewportBoundsProperty()));
+        showGreeting();
+    }
+
+    /** Returns the friendly greeting shown when the GUI first opens. */
+    private String getGreeting() {
+        return "Hello! I'm Nova.\nWhat can I do for you?";
+    }
+
+    /** Adds Nova's greeting as the first dialog in the conversation. */
+    private void showGreeting() {
+        dialogContainer.getChildren().add(DialogBox.getNovaDialog(getGreeting(), novaImage));
     }
 
     /** Parses and executes the entered command, then displays Nova's real response. */
