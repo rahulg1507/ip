@@ -22,7 +22,7 @@
                 mnemonicParsing="false" onAction="#handleUserInput"
                 prefHeight="41.0" prefWidth="76.0" minWidth="76.0" maxWidth="76.0" text="Send"
                 AnchorPane.bottomAnchor="1.0" AnchorPane.rightAnchor="0.0" />
-        <ScrollPane fx:id="scrollPane" fitToWidth="true" hbarPolicy="NEVER"
+        <ScrollPane fx:id="scrollPane" fitToWidth="true" pannable="true" hbarPolicy="NEVER"
                     hvalue="1.0" prefHeight="557.0" vvalue="1.0"
                     AnchorPane.bottomAnchor="43.0" AnchorPane.leftAnchor="0.0"
                     AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">

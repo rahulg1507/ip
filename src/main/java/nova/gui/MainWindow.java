@@ -49,10 +49,11 @@ public class MainWindow extends AnchorPane {
         this.commandHandler = new CommandHandler(storage, tasks, ui);
     }
 
-    /** Binds the dialog container to the scroll pane's position and available width. */
+    /** Initializes scrolling and binds the dialog container to the available viewport width. */
     @FXML
     public void initialize() {
-        scrollPane.vvalueProperty().bind(dialogContainer.heightProperty());
+        dialogContainer.heightProperty().addListener((observable, oldHeight, newHeight) ->
+                scrollPane.setVvalue(1.0));
         dialogContainer.prefWidthProperty().bind(
                 Bindings.createDoubleBinding(() -> scrollPane.getViewportBounds().getWidth(),
                         scrollPane.viewportBoundsProperty()));
